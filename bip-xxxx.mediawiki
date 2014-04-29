@@ -17,29 +17,40 @@ This proposal is hereby placed in the public domain.
 
 == Specification ==
 
-* Define ''K'' as the secret, which is an unsigned integer of arbitrary precision.
-* Define ''L'' as the precision of the secret, in bits. For an ordinary Bitcoin private key, ''L'' = 256.
-* Define ''P''<sub>''L''</sub> as the largest prime number that is less than 2<sup>''L''</sup>.
-** ''P''<sub>16</sub> := 2<sup>16</sup> − 15.
-** ''P''<sub>128</sub> := 2<sup>128</sup> − 159.
-** ''P''<sub>192</sub> := 2<sup>192</sup> − 237.
-** ''P''<sub>256</sub> := 2<sup>256</sup> − 189.
-** ''P''<sub>384</sub> := 2<sup>384</sup> − 317.
-** ''P''<sub>512</sub> := 2<sup>512</sup> − 569.
-* Define ''M'' ≥ 2 as the minimum number of shares to be required when recovering the secret.
-* Define Hash<sub>''L''</sub>(''m'') as a function that:
-*# accepts an argument ''m'', which is an unsigned integer of precision ''L'',
-*# computes the [http://en.wikipedia.org/wiki/SHA-2 SHA-512] message digest of a message consisting of the ''L''-bit binary encoding of ''m'' in big-endian byte order,
-*# interprets the resulting message digest as the 512-bit binary encoding of an unsigned integer ''d'' in big-endian byte order,
-*# returns ''d'' mod ''P''<sub>''L''</sub> as an unsigned integer of precision ''L''.
+* Define ''K'' as the secret, which is a sequence of 16, 32 or 64 bytes.
+* Define ''L'' as the length of the secret, in bytes. For an ordinary Bitcoin private key, ''L'' = 32.
+* Define ''M'' ≥ 1 as the minimum number of shares to be required when recovering the secret.
+* Define '''GF''' as the finite field of order 2<sup>8</sup>, i.e. the field of equivalence classes of <!--
+  --> polynomials whose coefficients belong to GF(2).  These polynomials are represented as bytes where <!--
+  --> a more significant bit is a coefficient at a higher degree.  The modulus is the polynomial <!--
+  --> ''x''<sup>8</sup>+''x''<sup>4</sup>+''x''<sup>3</sup>+''x''<sup>2</sup>+1, or 0x11d.
+* Define '''GF'''<sup>''L''</sup> as the ''L''-dimensional vector space over '''GF''', whose elements are <!--
+  --> represented as byte sequences of length ''L''.
+* Define vector multiplication in '''GF'''<sup>''L''</sup> as bytewise multiplication in '''GF''': <!--
+  --> <br/>&lt;''a''<sub>0</sub>, ''a''<sub>1</sub>, …, ''a''<sub>''L''-1</sub>&gt; · <!--
+  --> &lt;''b''<sub>0</sub>, ''b''<sub>1</sub>, …, ''b''<sub>''L''-1</sub>&gt; = <!--
+  --> &lt;''a''<sub>0</sub>·''b''<sub>0</sub>, ''a''<sub>1</sub>·''b''<sub>1</sub>, …, <!--
+  --> ''a''<sub>''L''-1</sub>·''b''<sub>''L''-1</sub>&gt; .
+* Define Hash<sub>''w''</sub>(''m'') as a function that:
+*# accepts an argument ''m'', which is an sequence of bytes,
+*# computes the [http://en.wikipedia.org/wiki/SHA-2 SHA-256] message digest of the SHA-256 message digest of ''m'',
+*# and returns the first ''w'' bytes of the resulting digest.
 
 === Derivation of Shares from Secret ===
 
-# Let ''a''<sub>0</sub> := ''K''.
-# Let ''a''<sub>''i''</sub> := Hash<sub>''L''</sub>(''a''<sub>''i''−1</sub>) for 1 ≤ ''i'' &lt; ''M''.
-# Let ''x''<sub>''j''</sub> := ''j'' + 1 for 0 ≤ ''j'' &lt; ''P''<sub>''L''</sub>−1.
-# Let ''y''<sub>''j''</sub> := ''a''<sub>0</sub>·''x''<sub>''j''</sub><sup>0</sup> + ''a''<sub>1</sub>·''x''<sub>''j''</sub><sup>1</sup> + … + ''a''<sub>''M''−1</sub>·''x''<sub>''j''</sub><sup>''M''−1</sup> (mod ''P''<sub>''L''</sub>) for 0 ≤ ''j'' &lt; ''P''<sub>''L''</sub>−1.
-# The shares are the ordered pairs (''x''<sub>''j''</sub>, ''y''<sub>''j''</sub>) for 0 ≤ ''j'' &lt; ''P''<sub>''L''</sub>−1.
+# Compute ''a''<sub>0</sub>, ''a''<sub>1</sub>, …, ''a''<sub>''M''-1</sub> &isin; '''GF'''<sup>''L''</sup> <!--
+  --> such that ''a''<sub>0</sub> = ''K'' and all ''a''<sub>''j''</sub> are unpredictable to anyone who <!--
+  --> does not know ''K''. <br /><!--
+  --> Implementations can use random numbers, for example.  If a deterministic algorithm is desired so that <!--
+  --> additional shares can be issued which are compatible with the previous shares for the same secret, then <!--
+  --> <br/>for each ''i'' from 0 to ''M''-2:
+## split ''a''<sub>''i''</sub> into chunks of 32 bytes (the last chunk can be shorter);
+## apply Hash<sub>''w''</sub> to each chunk, where ''w'' is the size of the chunk in bytes;
+## let ''a''<sub>''i''+1</sub> be the concatenation of the results of the previous step.
+# Let ''y''(''x'') := ''a''<sub>0</sub>·''x''<sup>0</sup> + ''a''<sub>1</sub>·''x''<sup>1</sup> + … <!--
+  --> + ''a''<sub>''M''−1</sub>·''x''<sup>''M''−1</sup> in '''GF'''<sup>''L''</sup> <!--
+  --> for ''x'' &isin; '''GF''', x ≠ 0 (i.e. 1 ≤ ''x'' ≤ 255).
+# The shares are the ordered pairs (''x'', ''y''(''x'')).
 
 === Recovery of Secret from Shares ===
 
