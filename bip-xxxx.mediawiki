@@ -26,11 +26,6 @@ This proposal is hereby placed in the public domain.
   --> ''x''<sup>8</sup>+''x''<sup>4</sup>+''x''<sup>3</sup>+''x''<sup>2</sup>+1, or 0x11d.
 * Define '''GF'''<sup>''L''</sup> as the ''L''-dimensional vector space over '''GF''', whose elements are <!--
   --> represented as byte sequences of length ''L''.
-* Define vector multiplication in '''GF'''<sup>''L''</sup> as bytewise multiplication in '''GF''': <!--
-  --> <br/>&lt;''a''<sub>0</sub>, ''a''<sub>1</sub>, …, ''a''<sub>''L''-1</sub>&gt; · <!--
-  --> &lt;''b''<sub>0</sub>, ''b''<sub>1</sub>, …, ''b''<sub>''L''-1</sub>&gt; = <!--
-  --> &lt;''a''<sub>0</sub>·''b''<sub>0</sub>, ''a''<sub>1</sub>·''b''<sub>1</sub>, …, <!--
-  --> ''a''<sub>''L''-1</sub>·''b''<sub>''L''-1</sub>&gt; .
 * Define Hash<sub>''w''</sub>(''m'') as a function that:
 *# accepts an argument ''m'', which is an sequence of bytes,
 *# computes the [http://en.wikipedia.org/wiki/SHA-2 SHA-256] message digest of the SHA-256 message digest of ''m'',
@@ -54,12 +49,12 @@ This proposal is hereby placed in the public domain.
 
 === Recovery of Secret from Shares ===
 
-# Let (''x''<sub>''i''</sub>, ''y''<sub>''i''</sub>) be any ''M'' distinct shares for 0 ≤ ''i'' &lt; ''M''.
-# Let ''n''<sub>''i''</sub> := ''x''<sub>0</sub> · … · ''x''<sub>''i''−1</sub> · ''x''<sub>''i''+1</sub> · … · ''x''<sub>''M''−1</sub> (mod ''P''<sub>''L''</sub>) for 0 ≤ ''i'' &lt; ''M''.
-#* That is, ''n''<sub>''i''</sub> is the product (mod ''P''<sub>''L''</sub>) of all ''x''<sub>''j''</sub> for 0 ≤ ''j'' &lt; ''M'' and ''j'' ≠ ''i''.
-# Let ''d''<sub>''i''</sub> := (''x''<sub>0</sub>−''x''<sub>''i''</sub>) · … · (''x''<sub>''i''−1</sub>−''x''<sub>''i''</sub>) · (''x''<sub>''i''+1</sub>−''x''<sub>''i''</sub>) · … · (''x''<sub>''M''−1</sub>−''x''<sub>''i''</sub>) (mod ''P''<sub>''L''</sub>) for 0 ≤ ''i'' &lt; ''M''.
-#* That is, ''d''<sub>''i''</sub> is the product (mod ''P''<sub>''L''</sub>) of all ''x''<sub>''j''</sub>−''x''<sub>''i''</sub> for 0 ≤ ''j'' &lt; ''M'' and ''j'' ≠ ''i''.
-# Let ''a''<sub>0</sub> := ''y''<sub>0</sub>·''n''<sub>0</sub>·''d''<sub>0</sub><sup>-1</sup> + ''y''<sub>1</sub>·''n''<sub>1</sub>·''d''<sub>1</sub><sup>-1</sup> + … + ''y''<sub>''M''−1</sub>·''n''<sub>''M''−1</sub>·''d''<sub>''M''−1</sub><sup>-1</sup> (mod ''P''<sub>''L''</sub>).
+# Let (''x''<sub>''i''</sub>, ''y''(''x''<sub>''i''</sub>)) be any ''M'' distinct shares for 0 ≤ ''i'' &lt; ''M''.
+# Let ''n''<sub>''i''</sub> := ''x''<sub>0</sub> · … · ''x''<sub>''i''−1</sub> · ''x''<sub>''i''+1</sub> · … · ''x''<sub>''M''−1</sub> (in '''GF''') for 0 ≤ ''i'' &lt; ''M''.
+#* That is, ''n''<sub>''i''</sub> is the product in '''GF''' of all ''x''<sub>''j''</sub> for 0 ≤ ''j'' &lt; ''M'' and ''j'' ≠ ''i''.
+# Let ''d''<sub>''i''</sub> := (''x''<sub>0</sub>−''x''<sub>''i''</sub>) · … · (''x''<sub>''i''−1</sub>−''x''<sub>''i''</sub>) · (''x''<sub>''i''+1</sub>−''x''<sub>''i''</sub>) · … · (''x''<sub>''M''−1</sub>−''x''<sub>''i''</sub>) (in '''GF''') for 0 ≤ ''i'' &lt; ''M''.
+#* That is, ''d''<sub>''i''</sub> is the product in '''GF''' of all ''x''<sub>''j''</sub>−''x''<sub>''i''</sub> for 0 ≤ ''j'' &lt; ''M'' and ''j'' ≠ ''i''.
+# Let ''a''<sub>0</sub> := ''y''(''x''<sub>0</sub>)·''n''<sub>0</sub>·''d''<sub>0</sub><sup>-1</sup> + ''y''(''x''<sub>1</sub>)·''n''<sub>1</sub>·''d''<sub>1</sub><sup>-1</sup> + … + ''y''(''x''<sub>''M''−1</sub>)·''n''<sub>''M''−1</sub>·''d''<sub>''M''−1</sub><sup>-1</sup> (in '''GF'''<sup>''L''</sup>).
 # The secret is ''a''<sub>0</sub>.
 
 === Encoding of Shares ===
