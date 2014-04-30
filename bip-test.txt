@@ -1,0 +1,90 @@
+Uncompressed private key, mainnet, M = 1, compact form (first 2 shares):
+Secret: ef3ced8329d55e434e82fc0d60050683a7ed48277dbec2103beb99ca8524fdab
+Private key: 5KdebUC1ynT8o4iBY4ge4wZwnSgYnnPZ2sE45qeXkpPDqVRez9F
+Share 1: SKM4gBvSWAHQ7HETvH1b4rmPUGxwJ5M6WCkC6FtB1n7pV2iu9NedS (53 chars)
+Share 2: SKM6cw6fxC8pnWNHVyvAgrii53t3unzoM5XqAN8Khg7UVRDTpxC21 (53 chars)
+
+Uncompressed private key, mainnet, M = 2, compact form (first 3 shares):
+Secret: 41239baa38b182ba774e89c143339f80e9f61cabe2201f0b8672777c4e8ba498
+Private key: 5JJyULsJa4sErFniHZdp42V6TxbbxsAZSsuKKxNTsEXnNnKH5he
+Share 1: SKMaku67PwssKcvsbtNJ35p5zat6fXaXuBBuPUqcAF9deWj7kbhbM (53 chars)
+Share 2: SKMc4Dt9vdH6iDxufiDZYsAHL3kRRSqt1dC4bUb4hP9xqHHWh19a8 (53 chars)
+Share 3: SKMeHqzNJS6eXi7V6iNxMhis9fQgTePhm7CNtb1pKmzfRs7BQPwGx (53 chars)
+
+Uncompressed private key, testnet, M = 2, compact form (first 3 shares):
+Secret: afc2b916ca59541cf942bb9cb119ab5629680095dd002452208142300ccfc980
+Private key: 92vKjTJWQPdjm9RbSYxXK7bYXz5TFqfPaFKpMhnwELXdYVHxhkP
+Share 1: SLYDbS1Duz3vsWZG21Uzt8KzATQjaLFSsfhgiN68f9nNtQC8ZfkW1 (53 chars)
+Share 2: SLYFrKE8dPyzHVEEezXqye3QmWcWwFRzGCsVxzoQWARRGM8ifHTBN (53 chars)
+Share 3: SLYJ21iokWRsFF4Wwcs6sy1sQXPPr9DeFdZVsXhmk7MnrjR6rxDrq (53 chars)
+
+Compressed private key, mainnet, M = 2, compact form (first 3 shares):
+Secret: ab0ea0686a0693662cb916e29619a44e0b8aa8ddd56bc7f1a61ba3d2b65ee078
+Private key: L2xDvSYT7R9QqbtGKbujbwEcjhsuhQenydaQaSMKEbjYLi1CZcfS
+Share 1: SKWAGjBEKbYWgLdXQfbSehwksEiTYc6WjTWSXtxr8n9vfJKUC8Vek (53 chars)
+Share 2: SKWCABzPLP3sAjBC8brWauVMVJ7Z58wjvjs2cVUktvXAMW9KUxAiN (53 chars)
+Share 3: SKWEhVG6Lkb6wqPBgYN7Zqa3GX1q1as7RMPNEVWodVsnDaoSeVcsC (53 chars)
+
+Compressed private key, testnet, M = 2, compact form (first 3 shares):
+Secret: 76fc670dd079a8f3bc397aa248020e75c88a0d50e1cf33d22bd9e3db747f1f74
+Private key: cRZzefz18UpJhs8u6obqEA7WiMGB6u48ofAAzsPxA19rV6yYppZD
+Share 1: SLgobJBZEVX8DvgiHdohdt8HVnMDT46mdVpDoh6nj5nvqH7fUmfZ8 (53 chars)
+Share 2: SLgqKBZRGj83iFw1jLEMKAxANB3LDaHvaoPgFiunNu9c91zVXo3HV (53 chars)
+Share 3: SLgsLjyLv27Te5uhYBpuURpJUeet4pEhetgsjXvxHJRHHSCEPwhLN (53 chars)
+
+Uncompressed private key, mainnet, M = 4, compact form (first 4 shares):
+Secret: 7b4c4967e0a704723c1f614bd82242ee78ea234ae3b8f0f18ce5a867ffd0d3f1
+Private key: 5Jkb4dEF2zy153aSxjpUYJgmXXNZFXDX5ZkaE4gXi49ACk7T4t5
+Share 1: SKNf3rBBXcPaw8JpCLhg4cL7YzrRJSisYETV5tsXEy3SRu9zPYghH (53 chars)
+Share 2: SKNhvpcSJC4XsZxMiNYpGRAihpBFyMZPiJUGRx94pFLKxd9Yw77tm (53 chars)
+Share 3: SKNiH7CJZXoz4ySeEekv2xp94J3uAcmwEM3vWMRoG4bvYAPB5MVfW (53 chars)
+Share 4: SKNmjZPb23hMFoRRUEM6WYKupB8yVjm67LPuYEo8dewcu2myhvQ9h (53 chars)
+
+Uncompressed private key, mainnet, M = 2, long form (first 2 shares):
+Secret: aac6247e9b2e279f6f68bb0f0c587da3dc0df5eb61844632caea6cce1f178267
+Private key: 5K7Vmqxqna7hSiMj13vHCRXC2Qm2w7JKoAsRJwJfZNcH2urrYBS
+Hash: 2d20
+Share 1: SK6tmN1V7QLpc4wvWaECkT35Kbpkb4tXcJywFgYZoWwAiNBhSn8ysqCze (57 chars)
+Share 2: SK6tmN1XHbpPshawLg2qP6Mq7ygaFKuUWb1ar6J6nkY1eTo89fJ4m4PoX (57 chars)
+
+Uncompressed private key, mainnet, M = 2, short form (first 2 shares):
+Secret: 0cc1f04368c501411789c484653640518cdfd75b650fb62a5e46fa4b5da97fd1
+Private key: 5HuuTSAZFdj4hvTZvwt8UpE2rxDoL8SzevmmfJS2WAsKudCTZ5N
+Share 1: SK3NCucqMe7kABoDnWsuDry5aqP6g8yqbcKtaaFTKu6ZzbR3nMyWo (53 chars)
+Share 2: SK3Pz7ACNj96KmqyvhPfVKkNdUeVFWVWENpPtjJWpWS5i8dTxWw52 (53 chars)
+
+128-bit seed, mainnet, M = 2, compact form (first 3 shares):
+Secret: 65027a4213726dd5c986dcc6d431a7a3
+Share 1: SS9wL2ro9bvxH35uwu4qnsKcPsYAFdc (31 chars)
+Share 2: SSA2vn3PhGbXjrCECexhUEgeqDFFEX3 (31 chars)
+Share 3: SSA5WTWQ8u41dRd1NfuSN27ij7sfvfq (31 chars)
+
+128-bit seed, testnet, M = 2, compact form (first 3 shares):
+Secret: 56d72dc8ea243cac6cc1688d3e3ce63d
+Share 1: STEtfUNTaXmuVdHRMitJgLdJwW7DJnJ (31 chars)
+Share 2: STF1NfoWkccWt9jCvYCPAbzzRJEH6Zg (31 chars)
+Share 3: STF4BiY2V99GbG82hHgu1Xg1x3H29s3 (31 chars)
+
+256-bit seed, mainnet, M = 2, compact form (first 3 shares):
+Secret: 428b2ef87a372d4a7ecb4af5293932b0c903e9a908bb0ff1928af8640fe79188
+Share 1: SSTRcFyV5X1iKhDcfrx1LVtW6ZiW3kn53yRjKTTo4VB2XVWAM9jd4 (53 chars)
+Share 2: SSTTWyqHbG384Jn3ykSfmcQivM1CY4Kge1mGUuADSNsw3srL5UebM (53 chars)
+Share 3: SSTUefrRxTyn9Ev8M3CHiiKMMacregWoB2KgpKaH4Lstg11jHT8y4 (53 chars)
+
+256-bit seed, testnet, M = 2, compact form (first 3 shares):
+Secret: f9db19ca1771398ebb50c29190f7ca87cc2ce4d116c2040ef04ba4ef8a3b9446
+Share 1: STe55kE9nMEJnjxGS5aQTGuEnntngkYtGMUwY6zamqgvY9AJoKuRP (53 chars)
+Share 2: STe6rWHewSncBjJebAAdtyoxyztim2VzfmgS4VcoD1P1Wp9MQj9YD (53 chars)
+Share 3: STe8cpCpycGQGXdaBkFbobiXd4yUxzaBkTwMDfHBWpC2akxNEFih1 (53 chars)
+
+512-bit seed, mainnet, M = 2, compact form (first 3 shares):
+Secret: 3d845da1dd6111c3d3ea9fb48953ff9a694fd18c5055d3ea841eaf752c5749a2b15bcca7847905ba92c1780d5c40373aac9d53bd8187659d4b1dd14cb30361fa
+Share 1: SSuSzg1tiMZFMnZ3VoSs3ikCpaSdZbYR1RTU5aLmme4K3g3Z2moyz4rMyoni1Mzb1mZdMAxqPTcbPrRrGihg6mjPZXu5ZhJ9M (97 chars)
+Share 2: SSuThBzFZUjarouTWmMM8wMNsH7yhTDxXt5Fpi5eGTQnPX7yDaXxnpyjcpjrN4tC9QQbxWBnbq4EVbdgSG7oPB4MLdcqhGrwf (97 chars)
+Share 3: SSuUPZwgNaigoaJ94vomoxpTksoRG1h9LE9SHiGM4M9NpfCTSwhzd5Psfu1ZCHGsdMNRSANH9zgC5eaqG3B6CjXBgao6yonHo (97 chars)
+
+512-bit seed, testnet, M = 2, compact form (first 3 shares):
+Secret: dcfd2e3f255b8007a56ac2c1f25b9e715b29b390f34086810af0b2beed3f5d4111f30fbbfbf193bada3339fce0cdbb95ae8ff1aac1079bc36985ab2609349687
+Share 1: STxchU6Ut1gXVZnsLYLiSSow2iFkAaHFLDAXh4zgqv4fABhUFpFt11dDKidypPv5eczoMUdyum3jte3JN7L4UAeunezAA67RV (97 chars)
+Share 2: STxdCSH1Rmivmy3hQAYvz9NY3xdiZMx92AtoXMXHJYofQWHmuYPo31kAqAotiZKNsBhUs4BgXRHW7h2R5J5gnJWDgnfTkfavH (97 chars)
+Share 3: STxeJDHpJm4kAbDAk2tN8iG6pSJwPwACosyHDnH9dkMCTn1hSVa8NTK21q6WbN4btf6ShPtPYHZrEQYoriJsf1eQ1HakguMCm (97 chars)

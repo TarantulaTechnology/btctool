@@ -59,124 +59,111 @@ This proposal is hereby placed in the public domain.
 
 === Encoding of Shares ===
 
-This encoding scheme is applicable to the first 256 shares: (''x''<sub>0</sub>, ''y''<sub>0</sub>) through (''x''<sub>255</sub>, ''y''<sub>255</sub>). Applications needing more than 256 shares must use some other encoding scheme.
+Three forms of encoding are specified: long, short and compact.
 
 # Construct a payload as follows:
 #* Byte 0 is the ''prefix byte'', as enumerated in the table below.
-#* Bytes 1 and 2 are the 16-bit binary encoding of Hash<sub>16</sub>(''K'') in big-endian byte order.
-#* Byte 3 has the value ''M'' − 1.
-#* Byte 4 is ''j'' for 0 ≤ ''j'' &lt; 256.
-#* The remaining bytes in the payload are the ''L''-bit binary encoding of ''y''<sub>''j''</sub> in big-endian byte order, for 0 ≤ ''j'' &lt; 256.
-# At the user's option, delete bytes 1 through 3, thereby reducing the length of the payload by 3 bytes. These bytes enable the detection of errors during secret recovery at the cost of disclosing information that could potentially assist an adversary.
+#* Bytes 1 and 2 contain Hash<sub>2</sub>(''K'') (long form only).
+#* Byte 3 has the value ''M'' (long form only).
+#* Byte 4 is either:
+#** ''x'' for 1 ≤ ''x'' ≤ 255 (long or short form); or
+#** ''M''·16 + ''x'' for 1 ≤ ''M'',''x'' ≤ 15 (compact form).
+#* The remaining bytes in the payload are the ''L'' bytes of ''y''(''x'').
+# If the user chooses short or compact form, bytes 1 through 3 are not included, thereby reducing the length of the payload by 3 bytes. These bytes enable the detection of errors during secret recovery at the cost of disclosing information that could potentially assist an adversary.  The compact form has the same length as the short form, but includes the value of ''M'' and can be used when the total number of shares does not exceed 15.
 # Encode the payload using Base58Check with an application/version byte as indicated in the table below.
 
 {|
-!Secret Type
-!Network
-!''L''
-!Hash<sub>16</sub>(''K'')<br/>and ''M'' − 1
-!Application/<br/>Version Byte
-!Prefix Byte
+!rowspan="2"|Secret Size
+!rowspan="2"|Form
+!rowspan="2"|Application/<br/>Version Byte
+!rowspan="2"|Secret Type
+!colspan="2"|Prefix Byte
 |-
-|rowspan="4"|Uncompressed private key
-|align="center" rowspan="2"|Mainnet
-|align="right" rowspan="2"|256
-|align="center"|Present
-|align="center"|<code>0x1A</code>
-|align="center"|<code>0x46</code>
+!Mainnet
+!Testnet
 |-
-|align="center"|Omitted
-|align="center"|<code>0x26</code>
-|align="center"|<code>0xF4</code>
-|-
-|align="center" rowspan="2"|Testnet
-|align="right" rowspan="2"|256
-|align="center"|Present
-|align="center"|<code>0x1B</code>
-|align="center"|<code>0x4F</code>
-|-
-|align="center"|Omitted
-|align="center"|<code>0x28</code>
-|align="center"|<code>0x7C</code>
-|-
-|rowspan="4"|Compressed private key
-|align="center" rowspan="2"|Mainnet
-|align="right" rowspan="2"|256
-|align="center"|Present
-|align="center"|<code>0x1A</code>
-|align="center"|<code>0x47</code>
-|-
-|align="center"|Omitted
-|align="center"|<code>0x26</code>
-|align="center"|<code>0xF6</code>
-|-
-|align="center" rowspan="2"|Testnet
-|align="right" rowspan="2"|256
-|align="center"|Present
-|align="center"|<code>0x1B</code>
-|align="center"|<code>0x50</code>
-|-
-|align="center"|Omitted
-|align="center"|<code>0x28</code>
-|align="center"|<code>0x7E</code>
-|-
-|rowspan="12"| [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seed
-|align="center" rowspan="6"|Mainnet
-|align="right" rowspan="2"|128
-|align="center"|Present
+|rowspan="3"|128 bits
+|align="center"|long
 |align="center"|<code>0x0E</code>
+|rowspan="3" align="center"|seed
 |align="center"|<code>0x53</code>
+|align="center"|<code>0x55</code>
 |-
-|align="center"|Omitted
-|align="center"|<code>0x15</code>
-|align="center"|<code>0x3D</code>
+|align="center"|short
+|rowspan="2" align="center"|<code>0x15</code>
+|align="center"|<code>0x3C</code>
+|align="center"|<code>0x40</code>
 |-
-|align="right" rowspan="2"|256
-|align="center"|Present
-|align="center"|<code>0x1A</code>
-|align="center"|<code>0x49</code>
+|align="center"|compact
+|align="center"|<code>0x3B</code>
+|align="center"|<code>0x3F</code>
 |-
-|align="center"|Omitted
+|rowspan="9"|256 bits
+|align="center" rowspan="3"|long
+|align="center" rowspan="3"|<code>0x1A</code>
+|align="center"|uncompressed private key
 |align="center"|<code>0x26</code>
-|align="center"|<code>0xF8</code>
+|align="center"|<code>0x2C</code>
 |-
-|align="right" rowspan="2"|512
-|align="center"|Present
+|align="center"|compressed private key
+|align="center"|<code>0x27</code>
+|align="center"|<code>0x2D</code>
+|-
+|align="center"|seed
+|align="center"|<code>0x46</code>
+|align="center"|<code>0x4C</code>
+|-
+|align="center" rowspan="3"|short
+|rowspan="6" align="center"|<code>0x26</code>
+|align="center"|uncompressed private key
+|align="center"|<code>0xC4</code>
+|align="center"|<code>0xCC</code>
+|-
+|align="center"|compressed private key
+|align="center"|<code>0xC5</code>
+|align="center"|<code>0xCD</code>
+|-
+|align="center"|seed
+|align="center"|<code>0xF4</code>
+|align="center"|<code>0xFC</code>
+|-
+|align="center" rowspan="3"|compact
+|align="center"|uncompressed private key
+|align="center"|<code>0xC6</code>
+|align="center"|<code>0xCE</code>
+|-
+|align="center"|compressed private key
+|align="center"|<code>0xC7</code>
+|align="center"|<code>0xCF</code>
+|-
+|align="center"|seed
+|align="center"|<code>0xF6</code>
+|align="center"|<code>0xFE</code>
+|-
+|rowspan="3"|512 bits
+|align="center"|long
 |align="center"|<code>0x58</code>
-|align="center"|<code>0x7E</code>
+|rowspan="3" align="center"|seed
+|align="center"|<code>0x72</code>
+|align="center"|<code>0x8A</code>
 |-
-|align="center"|Omitted
-|align="center"|<code>0x83</code>
-|align="center"|<code>0x33</code>
+|align="center"|short
+|rowspan="2" align="center"|<code>0x83</code>
+|align="center"|<code>0x30</code>
+|align="center"|<code>0x48</code>
 |-
-|align="center" rowspan="6"|Testnet
-|align="right" rowspan="2"|128
-|align="center"|Present
-|align="center"|<code>0x0E</code>
-|align="center"|<code>0xE3</code>
-|-
-|align="center"|Omitted
-|align="center"|<code>0x16</code>
-|align="center"|<code>0x12</code>
-|-
-|align="right" rowspan="2"|256
-|align="center"|Present
-|align="center"|<code>0x1B</code>
-|align="center"|<code>0x51</code>
-|-
-|align="center"|Omitted
-|align="center"|<code>0x28</code>
-|align="center"|<code>0x80</code>
-|-
-|align="right" rowspan="2"|512
-|align="center"|Present
-|align="center"|<code>0x5B</code>
-|align="center"|<code>0xF9</code>
-|-
-|align="center"|Omitted
-|align="center"|<code>0x88</code>
-|align="center"|<code>0x5B</code>
+|align="center"|compact
+|align="center"|<code>0x32</code>
+|align="center"|<code>0x4A</code>
 |}
+
+Bit 1 (mask 0x02) of the prefix byte differentiates between short and compact forms:
+* when not set, byte 4 of the payload is ''x'';
+* when set (and the A/V byte indicates it's not a long form), byte 4 of the payload contains M in the higher nibble and x in the lower one.
+
+Bit 0 (mask 0x01) of the prefix byte indicates, when the secret is a private key, that this key should be used with a compressed public key.
+
+Bit 3 (mask 0x08) of the prefix byte is a testnet indicator except for the special case of the 128-bit BIP32 seed.
 
 == Motivation ==
 
@@ -198,33 +185,36 @@ Shamir's Secret Sharing Scheme can be used in conjunction with the multi-signatu
 
 == Rationale ==
 
-It is anticipated that 256 shares will be more than enough for most applications of Shamir's Secret Sharing Scheme to Bitcoin private keys and BIP32 master seeds. Thus, to reduce encoded share size, the encodings of ''j'' and ''M'' − 1 are restricted to one byte each.
+It is anticipated that 255 shares will be more than enough for most applications of Shamir's Secret Sharing Scheme to Bitcoin private keys and BIP32 master seeds. Thus, to minimise code complexity, GF(2<sup>8</sup>) is chosen as the underlying field.
 
-The application/version bytes and prefix bytes were chosen to force the initial characters in the Base58Check encoding for mainnet keys/seeds to "SS", which can be taken as standing for "Shamir Share." Testnet keys/seeds have a prefix of "TS" to distinguish them visually.
+The application/version bytes and prefix bytes were chosen to force the initial characters in the Base58Check encoding for mainnet keys to "SK" and seeds to "SS", which can be taken as standing for "Shamir share of a Key or Seed." Testnet keys/seeds have prefixes of "SL" and "ST" respectively.
 
-The Hash<sub>16</sub>(''K'') and ''M'' − 1 fields are located at the beginning of the payload so that all shares for a given secret will share a common prefix and thus can be visually associated.
+The Hash<sub>2</sub>(''K'') and ''M'' fields are located at the beginning of the payload so that all shares for a given secret will share a common prefix and thus can be visually associated.
 
 == Reference Implementation ==
 
 === Test Vectors ===
 
-* '''Uncompressed private key, ''M'' = 2, optional bytes present''' (first 3 shares)
-** Private key: <code>5KShamir9pqYHfa63F2r9iA44sK4iDdo2gtyAXHCSRwuCLdqgCv</code>
-** Share 0: <code>SS5vaKvu62Wpu6cH8UTZYatPRcmhFuEK2e6qgD1R9kAWvRUE7ep5pRXw4</code>
-** Share 1: <code>SS5vaKvvKU2bLjj68AwChTJLhFgobdznDUY9yGLx1oHGzNLsUGUjHPw6H</code>
-** Share 2: <code>SS5vaKvyVeibEQhKo6YfS2csatZEY9gN22dB7CU7wxeBkDDAqGGYiLdFC</code>
-* '''Uncompressed private key, ''M'' = 3, optional bytes omitted''' (first 3 shares)
-** Private key: <code>5KShamir9pqYHfa63F2r9iA44sK4iDdo2gtyAXHCSRwuCLdqgCv</code>
-** Share 0: <code>SS99vNs8gWGcGXYn8BrskaGSLR89EgmFaVz5WvbCSWfQG8G7nxKay</code>
-** Share 1: <code>SS9BiCxZqLH39Qw7EEa8VvBKeWhz2sjPfNZktfiymU9QLES8k4QFF</code>
-** Share 2: <code>SS9DsdSSnxDDH6Fty4pFZjRPcBW5EdikGneCcCsSbmNJszwrikuvu</code>
-* '''Compressed private key, ''M'' = 3, optional bytes present''' (first 3 shares)
-** Private key: <code>L4Shamir4KSghoE4uGhHJMFiG2ZrXRXydMgFvCUaCLgXQ88YKBMz</code>
-** Share 0: <code>SSPid9bvrTGY96qyBqdVVPmZbvAcJseu2jYmpwiAK73zXW3shaG38VXcB</code>
-** Share 1: <code>SSPid9byzK7X6YYiThiBE1vdsWgfrzqU7R3uGvvNw49jwPoofKVDupsSR</code>
-** Share 2: <code>SSPid9c1cnMqpknQ7rUXJ3b6g5DindFLssqP9J2CkcuuvjSGQpKXD7ig9</code>
-* '''Compressed private key, ''M'' = 2, optional bytes omitted''' (first 3 shares)
-** Private key: <code>L4Shamir4KSghoE4uGhHJMFiG2ZrXRXydMgFvCUaCLgXQ88YKBMz</code>
-** Share 0: <code>SSSKHFer2Q7Lzq2CwnuHhmWGeD4hezAKHGMYu24wswFStEN9hmLQK</code>
-** Share 1: <code>SSSLni3MRdJqLoom1tz7vv6CwXa5yZSWQwA5aLBm3sDGeaw7b4Q6M</code>
-** Share 2: <code>SSSNJARrprWKgnbK614xA4g9Er5UJ8ihYbxcFeJaDoB6QwW1WjS3s</code>
+* '''Uncompressed private key, mainnet, ''M'' = 2, compact form''' (first 3 shares)
+** Secret: <code>ee642633bb066381cc22c289c30190ec11b967445a38110c8491702f34dcaf1b</code>
+** Private key: <code>5KdGxvP4QWyAcMBaqaixTrksuLFSBaDCRUCv2sykzNBqzSJQmku</code>
+** Share 1: <code>SKMaGkFbPWiyve22b3oBcBZSNbNWu9qzqfKZWuBgn7sCZgFsqizNq</code> (53 chars)
+** Share 2: <code>SKMcsd7jgD5MJk2YSzNpyDnugi2hqcLghhPnbhvDbWECzNfkJNc53</code>
+** Share 3: <code>SKMfG8ZUkKKT6VJDVDmpUjjNJMqtLE5csjaauxUhb9zo7XdoWDqzP</code>
+* '''Compressed private key, testnet, ''M'' = 2, compact form''' (first 3 shares)
+** Secret: <code>fa0487b457d96b820ac31d6f8a0e8efad79844219096783e3484cf09b24a516b</code>
+** Private key: <code>cVxhkPaB89GWJn65M3RtsFK6wCG7sTcJ5LnW2ZMUcCU2zxr24iQ7</code>
+** Share 1: <code>SLgoCtUFveresUizAcLqvhL3bwqQ7hudsSkUY1wG4vn2gfvcPgiXx</code> (53 chars)
+** Share 2: <code>SLgqcW4h8bEeFgLRH2CQrWSc5KR5SbLX5nR8Q2VyDgjtrKNMpjc7m</code>
+** Share 3: <code>SLgrwc4QY3P6qSPcrfzXEzq4kvekYMQhZLyk1Bcw73SfSG5hpnVf5</code>
+* '''Uncompressed private key, mainnet, ''M'' = 2, long form''' (first 2 shares)
+** Secret: <code>9074db560ac377aa7a9efa6c2ab8c32ac90ffeff251e28edcdf5b89a12ed235a</code>
+** Private key: <code>5JuuXb7tQNk1Nmme7Nqs3Pe3o7iSECzdRDmEb5U8ekHazrTnB3u</code>
+** Hash: <code>dcd3</code>
+** Share 1: <code>SKFd7FtmvyZLH3VRLMUjdkpQRi5DBpYiEDWaGt2tigybUusNANSBpT76o</code> (57 chars)
+** Share 2: <code>SKFd7Ftq4EgoevCaicMcCRrhgBP2wiqUE6hresfHN5gZqBAeqSVxUqjHE</code>
+* '''128-bit seed, mainnet, ''M'' = 2, compact form''' (first 3 shares)
+** Secret: <code>bd6b8f33bad1d3314f040a49aea3613e</code>
+** Share 1: <code>SS9yu27afjaGGfCtGYrvojo8HmxhWHW</code> (31 chars)
+** Share 2: <code>SS9zmdhsMcSm7YFzGnMxykYLnCc5hce</code>
+** Share 3: <code>SSA5AKrXof6F6u1Ytv5rRWhiXaCZkBs</code>
