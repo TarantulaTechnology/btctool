@@ -36,7 +36,7 @@ This proposal is hereby placed in the public domain.
 # Compute ''a''<sub>0</sub>, ''a''<sub>1</sub>, …, ''a''<sub>''M''-1</sub> &isin; '''GF'''<sup>''L''</sup> <!--
   --> such that ''a''<sub>0</sub> = ''K'' and all ''a''<sub>''j''</sub> are unpredictable to anyone who <!--
   --> does not know ''K''. <br /><!--
-  --> Implementations can use random numbers, for example.  If a deterministic algorithm is desired so that <!--
+  --> Implementations may use random numbers, for example.  If a deterministic algorithm is desired so that <!--
   --> additional shares can be issued which are compatible with the previous shares for the same secret, then <!--
   --> <br/>for each ''i'' from 0 to ''M''-2:
 ## split ''a''<sub>''i''</sub> into chunks of 32 bytes (the last chunk can be shorter);
@@ -193,7 +193,11 @@ The Hash<sub>2</sub>(''K'') and ''M'' fields are located at the beginning of the
 
 == Reference Implementation ==
 
+[bip-sss.py]
+
 === Test Vectors ===
+
+A set of test vectors is in [bip-test.txt].  More can be generated with [bip-sss.py].  Below are a few examples.
 
 * '''Uncompressed private key, mainnet, ''M'' = 2, compact form''' (first 3 shares)
 ** Secret: <code>ee642633bb066381cc22c289c30190ec11b967445a38110c8491702f34dcaf1b</code>
