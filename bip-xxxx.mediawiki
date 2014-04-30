@@ -193,11 +193,11 @@ The Hash<sub>2</sub>(''K'') and ''M'' fields are located at the beginning of the
 
 == Reference Implementation ==
 
-[bip-sss.py]
+[https://github.com/cetuscetus/btctool/blob/bip/bip-sss.py bip-sss.py]
 
 === Test Vectors ===
 
-A set of test vectors is in [bip-test.txt].  More can be generated with [bip-sss.py].  Below are a few examples.
+A set of test vectors is in [https://github.com/cetuscetus/btctool/blob/bip/bip-test.txt bip-test.txt].  More can be generated with [https://github.com/cetuscetus/btctool/blob/bip/bip-sss.py bip-sss.py].  Below are a few examples.
 
 * '''Uncompressed private key, mainnet, ''M'' = 2, compact form''' (first 3 shares)
 ** Secret: <code>ee642633bb066381cc22c289c30190ec11b967445a38110c8491702f34dcaf1b</code>
