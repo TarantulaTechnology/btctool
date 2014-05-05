@@ -195,6 +195,8 @@ The Hash<sub>2</sub>(''K'') and ''M'' fields are located at the beginning of the
 
 [https://github.com/cetuscetus/btctool/blob/bip/bip-sss.py bip-sss.py]
 
+This reference implementation is written with the aim of illustrating the algorithm and encoding scheme.  It is not optimised for any specific purpose nor does it follow any specific software development paradigm.
+
 === Test Vectors ===
 
 A set of test vectors is in [https://github.com/cetuscetus/btctool/blob/bip/bip-test.txt bip-test.txt].  More can be generated with [https://github.com/cetuscetus/btctool/blob/bip/bip-sss.py bip-sss.py].  Below are a few examples.
