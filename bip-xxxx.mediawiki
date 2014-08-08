@@ -119,21 +119,25 @@ Bits of the prefix byte indicate type of encoded content:
 
 == Motivation ==
 
+A common technique for protecting Bitcoin private keys is to encrypt the private key with a password, such as using [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38]. While this protects the key from anyone who cannot determine the password, it also has some significant drawbacks:
+
+# The encryption is only as strong as the password chosen by the user. Human beings are notoriously bad at choosing strong random passwords, and even worse at remembering them.
+
+# Once the key has been encrypted with a password the user is left with two things that he has to keep safe. If one of them is lost the key is lost.
+
+Shamir's Secret Sharing scheme allows you to split any secret into N shares, and set a threshold of M (1 <= M <= N)  shares that allow you to recombine the secret. A classic example is to configure M=2 and N=3, meaning that you split a secret into 3 shares, and any 2 shares can recombine the secret. When compared to the aforementioned private key encrypted by a password, it fixes both drawbacks:
+
+# There is no potentially weak human generated password.  
+
+# If you lose any one of the three shares due to theft, flood, or fire, you can still recreate the secret by combining the remaining two shares. If an adversary obtains one of two required shares, then the adversary has no better alternative than to brute force the secret.
+
 The idea of applying Shamir's Secret Sharing Scheme to Bitcoin private keys is frequently discussed within the Bitcoin community, but there has previously existed no technical recommendation for how to generate such shares or how to encode such shares for transmission and storage. This informational BIP seeks to standardize a method and encoding scheme to enable interoperability between multiple wallet implementations that may support Shamir's Secret Sharing functionality.
 
-=== Comparison with Alternatives ===
+=== This is not Multi-Sig ===
 
-Bitcoin supports [https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki a multi-signature scheme], in which redeeming transaction outputs requires signatures by multiple private keys. In theory this achieves the same objective as the application of Shamir's Secret Sharing Scheme to a single private key: namely, multiple pieces of information are required in order to spend the funds at an address, and any sufficiently large subset of the corpus of all such pieces of information suffices. Further, the multi-signature scheme has the advantage that the signatures can be computed independently at separate times and places. However, one critical disadvantage of the multi-signature scheme is the space it consumes in the block chain: all public keys in the corpus must be embedded in the scriptSig of every input that claims a multi-signature output. For this reason, "standard" multi-signature scriptSigs are presently limited to containing no more than three public keys. Even if this limitation were to be lifted, the multi-signature scheme would still yield rather large (and thus costly) scriptSigs. Another, lesser disadvantage of the multi-signature scheme is that it is more cumbersome for users to manage, as not only must users store the private keys, but they must also store a "redeem script."
+Bitcoin supports two multi-signature schemes ([https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki BIP11], [https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki BIP16]), in which redeeming transaction outputs requires signatures by multiple private keys.
 
-In comparison to the multi-signature scheme, Shamir's Secret Sharing Scheme has the disadvantage that a sufficient number of shares must be brought together in one place at one time in order to recover the private key that is needed for signing a transaction. However, it has several advantages:
-* No new address format is used, so all first-generation Bitcoin infrastructure already supports it implicitly.
-* Any number of shares can be generated and distributed without increasing the size of the scriptSig.
-* Any subset size can be required for successful key recovery without increasing the size of the scriptSig and without increasing the number of signature verification operations necessary to validate the transaction.
-* It can be extended to other secrets besides private keys, such as [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seeds.
-
-=== Use with Multi-signature ===
-
-Shamir's Secret Sharing Scheme can be used in conjunction with the multi-signature scheme mentioned above. As an example, consider a hypothetical organization that stores its operating funds at a 3-of-3 multi-signature address. Spending funds from this address requires signatures from the president, the chief financial officer, and the board of directors. Ideally, getting a signature from the board of directors should require the consent of a majority of the board, but if any single director has possession of the board's private key, then this "majority required" policy cannot be enforced cryptographically. However, if a distinct Shamir share, derived from the board's private key, is distributed to each director, then only a sufficiently large subset of the directors, working together, can recover the board's private key and sign the transaction.
+This specification is not a replacement for multi-sig transactions. Rather it provides a secure mechanism for storing and protecting private keys and [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38] master seeds, which in turn can be used for multi-signature transactions.
 
 == Rationale ==
 
