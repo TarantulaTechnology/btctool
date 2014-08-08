@@ -122,13 +122,13 @@ Bits of the prefix byte indicate type of encoded content:
 A common technique for protecting Bitcoin private keys is to encrypt the private key with a password, such as using [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38]. While this protects the key from anyone who cannot determine the password, it also has some significant drawbacks:
 
 # The encryption is only as strong as the password chosen by the user. Human beings are notoriously bad at choosing strong random passwords, and even worse at remembering them.
-
 # Once the key has been encrypted with a password the user is left with two things that he has to keep safe. If one of them is lost the key is lost.
 
-Shamir's Secret Sharing scheme allows you to split any secret into N shares, and set a threshold of M (1 <= M <= N)  shares that allow you to recombine the secret. A classic example is to configure M=2 and N=3, meaning that you split a secret into 3 shares, and any 2 shares can recombine the secret. When compared to the aforementioned private key encrypted by a password, it fixes both drawbacks:
+(placeholder: For some reason, if I don't add this line the next section disappears when media wiki renders this page)
+
+Shamir's Secret Sharing scheme allows you to split any secret into N shares, and set a threshold of M (1 ≤ M ≤ N)  shares that allow you to recombine the secret. A classic example is to configure M=2 and N=3, meaning that you split a secret into 3 shares, and any 2 shares can recombine the secret. When compared to the aforementioned private key encrypted by a password, it fixes both drawbacks:
 
 # There is no potentially weak human generated password.  
-
 # If you lose any one of the three shares due to theft, flood, or fire, you can still recreate the secret by combining the remaining two shares. If an adversary obtains one of two required shares, then the adversary has no better alternative than to brute force the secret.
 
 The idea of applying Shamir's Secret Sharing Scheme to Bitcoin private keys is frequently discussed within the Bitcoin community, but there has previously existed no technical recommendation for how to generate such shares or how to encode such shares for transmission and storage. This informational BIP seeks to standardize a method and encoding scheme to enable interoperability between multiple wallet implementations that may support Shamir's Secret Sharing functionality.
@@ -137,7 +137,7 @@ The idea of applying Shamir's Secret Sharing Scheme to Bitcoin private keys is f
 
 Bitcoin supports two multi-signature schemes ([https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki BIP11], [https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki BIP16]), in which redeeming transaction outputs requires signatures by multiple private keys.
 
-This specification is not a replacement for multi-sig transactions. Rather it provides a secure mechanism for storing and protecting private keys and [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38] master seeds, which in turn can be used for multi-signature transactions.
+This specification is not a replacement for multi-sig transactions. Rather it provides a secure mechanism for storing and protecting private keys and [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38] master seeds, which in turn can be used for multi-signature or classic transactions.
 
 == Rationale ==
 
