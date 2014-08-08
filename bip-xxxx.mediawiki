@@ -2,6 +2,8 @@
   BIP: xxxx
   Title: Shamir's Secret Sharing Scheme
   Author: Matt Whitlock <bip@mattwhitlock.name>
+          Nikita Schmidt
+          Jan Møller
   Status: Draft
   Type: Informational
   Created: 28-03-2014
@@ -9,7 +11,7 @@
 
 == Abstract ==
 
-A method is described for decomposing a secret (which may be a Bitcoin private key or a [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seed) into shares in a manner such that the secret can be recovered from any sufficiently large subset of the shares but such that individually the shares do not reveal any information about the secret. This method is commonly known as Shamir's Secret Sharing Scheme, or M of N secret sharing.
+A method is described for decomposing a secret (which may be a Bitcoin private key, a [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seed or extended private key, or anything else) into shares in a manner such that the secret can be recovered from any sufficiently large subset of the shares but such that individually the shares do not reveal any information about the secret. This method is commonly known as Shamir's Secret Sharing Scheme, or M of N secret sharing.
 Additionally, an encoding methodology is proposed to standardize transmission and storage of shares.
 
 == Copyright ==
@@ -18,9 +20,10 @@ This proposal is hereby placed in the public domain.
 
 == Specification ==
 
-* Define ''K'' as the secret, which is a sequence of 16, 32 or 64 bytes.
-* Define ''L'' as the length of the secret, in bytes. For an ordinary Bitcoin private key, ''L'' = 32.
-* Define ''M'' ≥ 1 as the minimum number of shares to be required when recovering the secret.
+* Define ''K'' as the secret, which is a sequence of bytes.
+* Define ''L'' as the length of the secret, in bytes. For an ordinary Bitcoin private key in SIPA format, ''L'' = 33 or 34.
+* Define 1 ≤ ''N'' ≤ 16 as the total number of shares requested.
+* Define 1 ≤ ''M'' ≤ N as the number of shares to be required when recovering the secret.
 * Define '''GF''' as the finite field of order 2<sup>8</sup>, i.e. the field of equivalence classes of <!--
   --> polynomials whose coefficients belong to GF(2).  These polynomials are represented as bytes where <!--
   --> a more significant bit is a coefficient at a higher degree.  The modulus is the polynomial <!--
@@ -45,8 +48,9 @@ This proposal is hereby placed in the public domain.
 ## let ''a''<sub>''i''+1</sub> be the concatenation of the results of the previous step.
 # Let ''y''(''x'') := ''a''<sub>0</sub>·''x''<sup>0</sup> + ''a''<sub>1</sub>·''x''<sup>1</sup> + … <!--
   --> + ''a''<sub>''M''−1</sub>·''x''<sup>''M''−1</sup> in '''GF'''<sup>''L''</sup> <!--
-  --> for ''x'' &isin; '''GF''', x ≠ 0 (i.e. 1 ≤ ''x'' ≤ 255).
+  --> for ''x'' &isin; '''GF''', 1 ≤ ''x'' ≤ 16.
 # The shares are the ordered pairs (''x'', ''y''(''x'')).
+Note that although mathematically ''x'' can be any non-zero element of '''GF''', i.e. between 1 and 255, our chosen encoding limits it to the maximum of 16.
 
 === Recovery of Secret from Shares ===
 
@@ -62,60 +66,25 @@ This proposal is hereby placed in the public domain.
 
 The encoding can optionally include a two-byte key identifier and the value of ''M''.  They enable detection of errors during secret recovery at the cost of disclosing information that could potentially assist an adversary.
 
+# Let ''ID'' be either two random bytes, or Hash<sub>2</sub>(''K''), at the implementation's discretion.  Its purpose is to help identify which shares belong together.
 # Construct a payload as follows:
-#* Byte 0 is the ''prefix byte'', as enumerated in the table below.
-#* Bytes 1 and 2 contain an optional key identifier:
-#** zeros, if the user has requested that key identifier be omitted; or
-#** Hash<sub>2</sub>(''K''), if it is not 0000; or
-#** FFFF hexadecimal, if Hash<sub>2</sub>(''K'') = 0000.
-#* Byte 3 has the value [''M'']·16 + ''x'' , where [''M''] is either ''M'' or 0.
+#* Byte 0 is the ''secret type byte'', as enumerated in the table below.
+#* Bytes 1 and 2 contain ''ID''.
+#* Byte 3 has the value (''M''-1)·16 + (''x''-1).
 #* The remaining bytes in the payload are the ''L'' bytes of ''y''(''x'').
-# Encode the payload using Base58Check with an application/version byte as indicated in the table below.
+# Encode the payload using Base58Check with no application/version byte.
 
+Values of the ''secret type byte'' are allocated as follows.
 {|
-!rowspan="2"|Secret Size
-!rowspan="2"|Application/<br/>Version Byte
-!rowspan="2"|Secret Type
-!colspan="2"|Prefix Byte
-!rowspan="2"|Base58<br/>Length
-|-
-!Mainnet
-!Testnet
-|-
-|128 bits
-|align="center"|<code>0x3F</code>
-|align="center"|seed
-|align="center"|<code>0x3B</code>
-|align="center"|<code>0x3C</code>
-|align="center"|34
-|-
-|rowspan="3"|256 bits
-|align="center" rowspan="3"|<code>0x73</code>
-|align="center"|uncompressed private key
-|align="center"|<code>0x70</code>
-|align="center"|<code>0x74</code>
-|align="center" rowspan="3"|56
-|-
-|align="center"|compressed private key
-|align="center"|<code>0x72</code>
-|align="center"|<code>0x76</code>
-|-
-|align="center"|seed
-|align="center"|<code>0xFB</code>
-|align="center"|<code>0xFC</code>
-|-
-|512 bits
-|align="center"|<code>0x06</code>
-|align="center"|seed
-|align="center"|<code>0xBB</code>
-|align="center"|<code>0xBC</code>
-|align="center"|99
+!Value!Type of secret|-
+|align="center"|0|Generic data with application-specific interpretation|-
+|align="center"|1|Bitcoin private key in SIPA format|-
+|align="center"|2|BIP32 seed as a sequence of 16, 32 or 64 bytes|-
+|align="center"|3|BIP32 extended private key
 |}
 
-Bits of the prefix byte indicate type of encoded content:
-* bit 3: 0 for private key, 1 for BIP32 seed;
-* bit 2: 0 for main network, 1 for test network;
-* bit 1: in case of a private key, 0 means uncompressed and 1 means compressed.
+For regular and BIP32-extended private keys, their encoded form before Base58Check is taken as the secret ''K'', including the application/version byte but excluding the checksum.  Consider for example a private key corresponding to a compressed public key:
+<center><code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</center>
 
 == Motivation ==
 
@@ -124,7 +93,6 @@ A common technique for protecting Bitcoin private keys is to encrypt the private
 # The encryption is only as strong as the password chosen by the user. Human beings are notoriously bad at choosing strong random passwords, and even worse at remembering them.
 # Once the key has been encrypted with a password the user is left with two things that he has to keep safe. If one of them is lost the key is lost.
 
-(placeholder: For some reason, if I don't add this line the next section disappears when media wiki renders this page)
 
 Shamir's Secret Sharing scheme allows you to split any secret into N shares, and set a threshold of M (1 ≤ M ≤ N)  shares that allow you to recombine the secret. A classic example is to configure M=2 and N=3, meaning that you split a secret into 3 shares, and any 2 shares can recombine the secret. When compared to the aforementioned private key encrypted by a password, it fixes both drawbacks:
 
