@@ -64,10 +64,10 @@ Note that although mathematically ''x'' can be any non-zero element of '''GF''',
 
 === Encoding of Shares ===
 
-The encoding can optionally include a two-byte key identifier and the value of ''M''.  They enable detection of errors during secret recovery at the cost of disclosing information that could potentially assist an adversary.
-
-# Let ''ID'' be either two random bytes, or Hash<sub>2</sub>(''K''), at the implementation's discretion.  Its purpose is to help identify which shares belong together.
-# Construct a payload as follows:
+# Let ''ID'' be a unique identifier for this set of shares; either
+#* two random bytes, or
+#* Hash<sub>2</sub>(''K''),<br/>at the implementation's discretion.  Its purpose is to help identify which shares belong together.
+# For each share (''x'', ''y''(''x'')), construct a payload as follows:
 #* Byte 0 is the ''secret type byte'', as enumerated in the table below.
 #* Bytes 1 and 2 contain ''ID''.
 #* Byte 3 has the value (''M''-1)·16 + (''x''-1).
@@ -76,15 +76,24 @@ The encoding can optionally include a two-byte key identifier and the value of '
 
 Values of the ''secret type byte'' are allocated as follows.
 {|
-!Value!Type of secret|-
-|align="center"|0|Generic data with application-specific interpretation|-
-|align="center"|1|Bitcoin private key in SIPA format|-
-|align="center"|2|BIP32 seed as a sequence of 16, 32 or 64 bytes|-
-|align="center"|3|BIP32 extended private key
+!Value
+!Type of secret
+|-
+|align="center"|0
+|Generic data with application-specific interpretation
+|-
+|align="center"|1
+|Bitcoin private key in SIPA format
+|-
+|align="center"|2
+|BIP32 seed as a sequence of 16, 32 or 64 bytes
+|-
+|align="center"|3
+|BIP32 extended private key
 |}
 
 For regular and BIP32-extended private keys, their encoded form before Base58Check is taken as the secret ''K'', including the application/version byte but excluding the checksum.  Consider for example a private key corresponding to a compressed public key:
-<center><code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</center>
+<div align="center"><code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</div>
 
 == Motivation ==
 
@@ -92,7 +101,6 @@ A common technique for protecting Bitcoin private keys is to encrypt the private
 
 # The encryption is only as strong as the password chosen by the user. Human beings are notoriously bad at choosing strong random passwords, and even worse at remembering them.
 # Once the key has been encrypted with a password the user is left with two things that he has to keep safe. If one of them is lost the key is lost.
-
 
 Shamir's Secret Sharing scheme allows you to split any secret into N shares, and set a threshold of M (1 ≤ M ≤ N)  shares that allow you to recombine the secret. A classic example is to configure M=2 and N=3, meaning that you split a secret into 3 shares, and any 2 shares can recombine the secret. When compared to the aforementioned private key encrypted by a password, it fixes both drawbacks:
 
@@ -109,44 +117,94 @@ This specification is not a replacement for multi-sig transactions. Rather it pr
 
 == Rationale ==
 
-It is anticipated that 15 shares will be enough for most applications of Shamir's Secret Sharing Scheme to Bitcoin private keys and BIP32 master seeds. Thus, ''M'' and ''x'' are allocated 4 bits each, and to minimise code complexity, GF(2<sup>8</sup>) is chosen as the underlying field.
+It is anticipated that 16 shares will be enough for most applications of Shamir's Secret Sharing Scheme. Thus, ''M'' and ''x'' are allocated 4 bits each, and GF(2<sup>8</sup>) is chosen as the underlying field to minimize code complexity.
 
-The application/version bytes and prefix bytes were chosen to force the initial characters in the Base58Check encoding for keys to "SK" and BIP32 seeds to "SS", which can be taken as standing for "Share of a Key/Seed".  However, certain 512 bit testnet seed encodings can also begin with "ST".
+The ''ID'' and ''M'' fields are located at the beginning of the payload so that all shares for a given secret will share a common prefix and thus can be visually associated.  It can be argued that their inclusion can assist an attacker.  However, this information is essential for secret recovery: the user must know which shares to combine and in what quantity.  If this is not contained in the shares, the user will need to find alternative means of recording this information out-of-band, for example, by writing it down next to each share or memorizing it.  This is inconvenient and/or risky for the user and/or helpful for the attacker in a similar way PINs and passwords are.  The point of Shamir's secret sharing, on the opposite, is to provide a safe, secure and convenient way to keep a secret without passwords.
 
-The Hash<sub>2</sub>(''K'') and ''M'' fields are located at the beginning of the payload so that all shares for a given secret will share a common prefix and thus can be visually associated.
+A common practice is to use the application/version byte (AVB) to both identify the type of payload and force the initial character/s in the Base58Check encoding to a specific prefix, aiding visual recognition of different types of encoded data.  However, the latter is only possible with fixed length payloads.  To preserve both functions of the AVB, this specification proposes to effectively move it outside of the binary payload by attaching the 'SSS-' prefix to the Base58Check encoded string.
 
 == Reference Implementation ==
 
-NOTE: reference implementation and test vectors are not up to date yet.
-
 [https://github.com/cetuscetus/btctool/blob/bip/bip-sss.py bip-sss.py]
 
-This reference implementation is written with the aim of illustrating the algorithm and encoding scheme.  It is not optimised for any specific purpose nor does it follow any specific software development paradigm.
+This reference implementation is written with the aim of illustrating the algorithm and encoding scheme.  It is not optimized for any specific purpose nor does it follow any specific software development paradigm.
 
 === Test Vectors ===
 
-A set of test vectors is in [https://github.com/cetuscetus/btctool/blob/bip/bip-test.txt bip-test.txt].  More can be generated with [https://github.com/cetuscetus/btctool/blob/bip/bip-sss.py bip-sss.py].  Below are a few examples.
+A copy is in [https://github.com/cetuscetus/btctool/blob/bip/bip-test.txt bip-test.txt].
 
-* '''Uncompressed private key, mainnet, ''M'' = 2, compact form''' (first 3 shares)
-** Secret: <code>ee642633bb066381cc22c289c30190ec11b967445a38110c8491702f34dcaf1b</code>
-** Private key: <code>5KdGxvP4QWyAcMBaqaixTrksuLFSBaDCRUCv2sykzNBqzSJQmku</code>
-** Share 1: <code>SKMaGkFbPWiyve22b3oBcBZSNbNWu9qzqfKZWuBgn7sCZgFsqizNq</code> (53 chars)
-** Share 2: <code>SKMcsd7jgD5MJk2YSzNpyDnugi2hqcLghhPnbhvDbWECzNfkJNc53</code>
-** Share 3: <code>SKMfG8ZUkKKT6VJDVDmpUjjNJMqtLE5csjaauxUhb9zo7XdoWDqzP</code>
-* '''Compressed private key, testnet, ''M'' = 2, compact form''' (first 3 shares)
-** Secret: <code>fa0487b457d96b820ac31d6f8a0e8efad79844219096783e3484cf09b24a516b</code>
-** Private key: <code>cVxhkPaB89GWJn65M3RtsFK6wCG7sTcJ5LnW2ZMUcCU2zxr24iQ7</code>
-** Share 1: <code>SLgoCtUFveresUizAcLqvhL3bwqQ7hudsSkUY1wG4vn2gfvcPgiXx</code> (53 chars)
-** Share 2: <code>SLgqcW4h8bEeFgLRH2CQrWSc5KR5SbLX5nR8Q2VyDgjtrKNMpjc7m</code>
-** Share 3: <code>SLgrwc4QY3P6qSPcrfzXEzq4kvekYMQhZLyk1Bcw73SfSG5hpnVf5</code>
-* '''Uncompressed private key, mainnet, ''M'' = 2, long form''' (first 2 shares)
-** Secret: <code>9074db560ac377aa7a9efa6c2ab8c32ac90ffeff251e28edcdf5b89a12ed235a</code>
-** Private key: <code>5JuuXb7tQNk1Nmme7Nqs3Pe3o7iSECzdRDmEb5U8ekHazrTnB3u</code>
-** Hash: <code>dcd3</code>
-** Share 1: <code>SKFd7FtmvyZLH3VRLMUjdkpQRi5DBpYiEDWaGt2tigybUusNANSBpT76o</code> (57 chars)
-** Share 2: <code>SKFd7Ftq4EgoevCaicMcCRrhgBP2wiqUE6hresfHN5gZqBAeqSVxUqjHE</code>
-* '''128-bit seed, mainnet, ''M'' = 2, compact form''' (first 3 shares)
-** Secret: <code>bd6b8f33bad1d3314f040a49aea3613e</code>
-** Share 1: <code>SS9yu27afjaGGfCtGYrvojo8HmxhWHW</code> (31 chars)
-** Share 2: <code>SS9zmdhsMcSm7YFzGnMxykYLnCc5hce</code>
-** Share 3: <code>SSA5AKrXof6F6u1Ytv5rRWhiXaCZkBs</code>
+<pre>
+Generic data: (empty)
+2 of 2 encoding; share set ID 5df6; share length 15
+  Share  1: SSS-14ZXDtxoVRt
+  Share  2: SSS-14ZXE1iukb1
+
+Generic data: 2a
+2 of 3 encoding; share set ID ff12; share length 16
+  Share  1: SSS-1jfWEJAWq3tp
+  Share  2: SSS-1jfWF9jSFTiG
+  Share  3: SSS-1jfWFSt3GfJD
+
+Generic data: 0102030405
+1 of 1 encoding; share set ID a26b; share length 22
+  Share  1: SSS-144mYqGo6HNUVyHcPU
+
+Generic data: 0102030405
+5 of 8 encoding; share set ID a26b; share length 22
+  Share  1: SSS-144mcTjU44mUVH9QUz
+  Share  2: SSS-144mcX3EqoDNfzatiX
+  Share  3: SSS-144mcaLzdimJWRtasc
+  Share  4: SSS-144mcbvf2srnUWzJSZ
+  Share  5: SSS-144mchJmEvCTNY4XRs
+  Share  6: SSS-144mcjVAGGCvvQHY3f
+  Share  7: SSS-144mcmpREcKJr3dRzH
+  Share  8: SSS-144mcqsryAQTMR3BVh
+
+Private key: 5KHCfJ1coRz4wb3K8yQ2oE8zDj5UXPyGhhjd8i9rMcCdDiZT2nu
+2 of 3 encoding; share set ID f6dc; share length 59
+  Share  1: SSS-RzBL5R47XrKMB4xiqcDsMdEETTqq1TtVFYv23bUx7V26wmEvb5QAErW
+  Share  2: SSS-RzBLEPKyLqrL39sAabaY7WWzg3PbKaFvbPcryu6zADjZGT5ACTjkExj
+  Share  3: SSS-RzBLNqQnKZpZ12Gu5CVQSCtuc8yMH3sgaeedCxs4h7uEz35FxRWSqDh
+
+Private key: L3dPtsJ2boms2CycFEwCi84t5Z6NieAbRECHcpUTDU97PsTj9y8c
+4 of 4 encoding; share set ID 9e73; share length 61
+  Share  1: SSS-2ZtoVyQRi8V1ajng5eQBewJqvDxSj4p9XfrPryvZEk6XvSMySgFoSvbKv
+  Share  2: SSS-2ZtoWcgHLJc7QdC7rwKojGBMjqrZYiCJWuzyXZ2Yrh5QcWfU97jTZFyry
+  Share  3: SSS-2ZtoWutspFJ9DNohXxSrQgqXWj1QsiEBCbBvSMGVNB6kk1BFFHhqr3AoJ
+  Share  4: SSS-2ZtoXjPFT6kTt9eDfE42it3sWAF4goCheBsbFDZ64wR5cXYx3Y86iNzns
+
+BIP32 seed: 04648efeca86da6163dd47602682c281
+16 of 16 encoding; share set ID 5b40; share length 36
+  Share  1: SSS-DTfoPLLyv4PQ3BQh9uFwmxkuLmRXTebe
+  Share  2: SSS-DTfoUMW5hP54mP1trNQJ4Ypi7fWcrbxL
+  Share  3: SSS-DTfoXr4DvKU5b7Ysax14sbgfte5JW1Jp
+  Share  4: SSS-DTfoaCUnUZ9SyErUdkp9wWibNWdyA1Ey
+  Share  5: SSS-DTfodK2Lrxz8j6CaF7JfZSEvRWb7eigy
+  Share  6: SSS-DTfohBBbpzckZp3NKcmPgJZUjJ19WnWT
+  Share  7: SSS-DTfomDJFc58PwMxKFdJGUogQWcwfeyAp
+  Share  8: SSS-DTfoqthbDkmqRaU8XwhT8bTAqps312dN
+  Share  9: SSS-DTfotLKKDTHKnxe7B63HRUqscrLGDhDS
+  Share 10: SSS-DTfoxvLrxXykcpaKP1VzWDf6u8NDyRrx
+  Share 11: SSS-DTfp1GH8D1hyFiCabLAoo2boUEuwnwzq
+  Share 12: SSS-DTfp65MkFTZCNkEQsM7eT19L1CENTTyH
+  Share 13: SSS-DTfp8b8RpavAFdBmRgMcgHbmLFNu73nN
+  Share 14: SSS-DTfpD5jDU9TgdT6aYPowU4YxfrPnGwZy
+  Share 15: SSS-DTfpFyT27F4tfxXFQV5x9RzJ3Q5zgcZ5
+  Share 16: SSS-DTfpKSYF6qa32UqW8KLhtaUFT1npHhbB
+
+BIP32 seed: 6126f07ba60866b740012cf1b88c569e705b42694b70299a4b89c036b36bc6d2
+3 of 6 encoding; share set ID 870a; share length 58
+  Share  1: SSS-8HU9SVBNGpTaDRyrH9FyuQp16koqa1kY2QDHDQsAR3B3n9NRuUpero
+  Share  2: SSS-8HU9VinANWTfHqMS1i5zXFZvraNU8M2p6f8e4WsB5XqpXhLUdayD52
+  Share  3: SSS-8HU9XmFcUZcfioeCaSChzCbfue1n2ncytPHLaqRBYz9ftFt84dzWZD
+  Share  4: SSS-8HU9YLWUDFj7kn5DUdhe13c46856pkVJF6GKYF8YDgGHDZJ12jp849
+  Share  5: SSS-8HU9asAUdUcq5vwFL5SZ3LRX9kfJLVezSFsc6833WeNeEMbKBbu44P
+  Share  6: SSS-8HU9dap8xQmWiZAF6BDEX5jgBAowu87SsD8MgUZvtumjx9DJW288XA
+
+BIP32 seed: edb5134d71a12238473dcf9483e6db8e5b741e9c46dc2eaf4cf7486b421c561e1e92e7c5c89512e54ad8eb7befc2019125a48292879208611259862b86be36a8
+2 of 4 encoding; share set ID 8d7a; share length 102
+  Share  1: SSS-3BkNYaWKZR2Sxnk17J2owupDEizvKaknymiXtfmgHEyboP4Fjf7fu6wV5KnXNJGPD5fPYCrejVEYxhu2rUr4C8cqRNSeTM8RZd
+  Share  2: SSS-3BkNYqD8LDcsoCSASeAdczxDkZGsX17VJdJUvLFHGsJTFTWpNrN81izoPknDdjQPiqRZx4NmYbKaHFRbLvtxtEjGTfj7ioc9b3
+  Share  3: SSS-3BkNZfJDjrwPAZUXWa9dN85czqxCGUhNRGt3NDZbxNjEkjzeGTgDAcHK2NYcydQyLWuvSaSj4qQPkRtxg8cWbcFHaUWF6ASbr1
+  Share  4: SSS-3BkNa4otYod7HZT78YBqUsCVVFRbwk1Lf3TpFaSAffEVvajSfetDvmtJ1c8R5eT9WzDB91wxySxSef3Fgqhktpy7VxPp5ot7tM
+</pre>
