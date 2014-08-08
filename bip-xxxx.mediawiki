@@ -1,8 +1,8 @@
 <pre>
   BIP: xxxx
   Title: Shamir's Secret Sharing Scheme
-  Author: Matt Whitlock <bip@mattwhitlock.name>
-          Nikita Schmidt
+  Author: Matt Whitlock <bip@mattwhitlock.name>,
+          Nikita Schmidt,
           Jan Møller
   Status: Draft
   Type: Informational
@@ -93,7 +93,7 @@ Values of the ''secret type byte'' are allocated as follows.
 |}
 
 For regular and BIP32-extended private keys, their encoded form before Base58Check is taken as the secret ''K'', including the application/version byte but excluding the checksum.  Consider for example a private key corresponding to a compressed public key:
-<div align="center"><code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</div>
+<div align="center">''K'' = <code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</div>
 
 == Motivation ==
 
@@ -113,15 +113,19 @@ The idea of applying Shamir's Secret Sharing Scheme to Bitcoin private keys is f
 
 Bitcoin supports two multi-signature schemes ([https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki BIP11], [https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki BIP16]), in which redeeming transaction outputs requires signatures by multiple private keys.
 
-This specification is not a replacement for multi-sig transactions. Rather it provides a secure mechanism for storing and protecting private keys and [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38] master seeds, which in turn can be used for multi-signature or classic transactions.
+This specification is not a replacement for multi-sig transactions. Rather it provides a secure mechanism for storing and protecting private keys and [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seeds, which in turn can be used for multi-signature or classic transactions.
 
 == Rationale ==
 
-It is anticipated that 16 shares will be enough for most applications of Shamir's Secret Sharing Scheme. Thus, ''M'' and ''x'' are allocated 4 bits each, and GF(2<sup>8</sup>) is chosen as the underlying field to minimize code complexity.
+It is anticipated that 16 shares will be enough for most applications of Shamir's Secret Sharing Scheme. Thus, ''M'' and ''x'' are allocated 4 bits each.
 
 The ''ID'' and ''M'' fields are located at the beginning of the payload so that all shares for a given secret will share a common prefix and thus can be visually associated.  It can be argued that their inclusion can assist an attacker.  However, this information is essential for secret recovery: the user must know which shares to combine and in what quantity.  If this is not contained in the shares, the user will need to find alternative means of recording this information out-of-band, for example, by writing it down next to each share or memorizing it.  This is inconvenient and/or risky for the user and/or helpful for the attacker in a similar way PINs and passwords are.  The point of Shamir's secret sharing, on the opposite, is to provide a safe, secure and convenient way to keep a secret without passwords.
 
+No provision has been made to make ''ID'' and ''M'' optional.  This is to reduce implementation burden associated with the complex logic required to handle cases when either or both are omitted, particularly in applications with a focus on user interface.
+
 A common practice is to use the application/version byte (AVB) to both identify the type of payload and force the initial character/s in the Base58Check encoding to a specific prefix, aiding visual recognition of different types of encoded data.  However, the latter is only possible with fixed length payloads.  To preserve both functions of the AVB, this specification proposes to effectively move it outside of the binary payload by attaching the 'SSS-' prefix to the Base58Check encoded string.
+
+An earlier draft of this specification proposed GF(''P'') as the field, where ''P'' was a large prime number close to 2<sup>8''L''</sup>, specified individually for each possible value of ''L''.  In order to support arbitrary length secrets, the field was changed to GF(2<sup>8</sup>).
 
 == Reference Implementation ==
 
