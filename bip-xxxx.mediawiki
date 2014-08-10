@@ -39,13 +39,13 @@ This proposal is hereby placed in the public domain.
 
 # Compute ''a''<sub>0</sub>, ''a''<sub>1</sub>, …, ''a''<sub>''M''-1</sub> &isin; '''GF'''<sup>''L''</sup> <!--
   --> such that ''a''<sub>0</sub> = ''K'' and all ''a''<sub>''j''</sub> are unpredictable to anyone who <!--
-  --> does not know ''K''. <br /><!--
+  --> does not know ''K'' or Hash<sub>2</sub>(''K''). <br /><!--
   --> Implementations may use random numbers, for example.  If a deterministic algorithm is desired so that <!--
   --> additional shares can be issued which are compatible with the previous shares for the same secret, then <!--
-  --> <br/>for each ''i'' from 0 to ''M''-2:
-## split ''a''<sub>''i''</sub> into chunks of 32 bytes (the last chunk can be shorter);
-## apply Hash<sub>''w''</sub> to each chunk, where ''w'' is the size of the chunk in bytes;
-## let ''a''<sub>''i''+1</sub> be the concatenation of the results of the previous step.
+  --> <br/>for each ''i'' from 1 to ''M''-1:
+## let ''b''<sub>''i'',0</sub> := SHA-256(''a''<sub>''i''-1</sub> || 0),<br/>where || denotes concatenation and 0 is a zero byte
+## for each ''j'' from 1 to (''L''-1) / 32: let ''b''<sub>''i'',''j''</sub> := SHA-256(''b''<sub>''i'',''j''-1</sub>)
+## let ''a''<sub>''i''</sub> be the first ''L'' bytes of ''b''<sub>''i'',0</sub> || … || ''b''<sub>''i'',(''L''-1)/32</sub>
 # Let ''y''(''x'') := ''a''<sub>0</sub>·''x''<sup>0</sup> + ''a''<sub>1</sub>·''x''<sup>1</sup> + … <!--
   --> + ''a''<sub>''M''−1</sub>·''x''<sup>''M''−1</sup> in '''GF'''<sup>''L''</sup> <!--
   --> for ''x'' &isin; '''GF''', 1 ≤ ''x'' ≤ 16.
@@ -145,9 +145,9 @@ Generic data: (empty)
 
 Generic data: 2a
 2 of 3 encoding; share set ID ff12; share length 16
-  Share  1: SSS-1jfWEJAWq3tp
-  Share  2: SSS-1jfWF9jSFTiG
-  Share  3: SSS-1jfWFSt3GfJD
+  Share  1: SSS-1jfWEHX9ZuJe
+  Share  2: SSS-1jfWEg4JWqva
+  Share  3: SSS-1jfWFCYeyJ5a
 
 Generic data: 0102030405
 1 of 1 encoding; share set ID a26b; share length 22
@@ -155,60 +155,60 @@ Generic data: 0102030405
 
 Generic data: 0102030405
 5 of 8 encoding; share set ID a26b; share length 22
-  Share  1: SSS-144mcTjU44mUVH9QUz
-  Share  2: SSS-144mcX3EqoDNfzatiX
-  Share  3: SSS-144mcaLzdimJWRtasc
-  Share  4: SSS-144mcbvf2srnUWzJSZ
-  Share  5: SSS-144mchJmEvCTNY4XRs
-  Share  6: SSS-144mcjVAGGCvvQHY3f
-  Share  7: SSS-144mcmpREcKJr3dRzH
-  Share  8: SSS-144mcqsryAQTMR3BVh
+  Share  1: SSS-144mcRq76dWLQsLd21
+  Share  2: SSS-144mcXdpygBsWrbvwu
+  Share  3: SSS-144mcZeBn5nFR3xTPN
+  Share  4: SSS-144mcc8mxMfpT3bkJP
+  Share  5: SSS-144mchoNRbMcqidZ83
+  Share  6: SSS-144mcmHxLSYMGJvaDL
+  Share  7: SSS-144mcoHUNeh59BBAwr
+  Share  8: SSS-144mcphz2XMyukfHDy
 
-Private key: 5KHCfJ1coRz4wb3K8yQ2oE8zDj5UXPyGhhjd8i9rMcCdDiZT2nu
-2 of 3 encoding; share set ID f6dc; share length 59
-  Share  1: SSS-RzBL5R47XrKMB4xiqcDsMdEETTqq1TtVFYv23bUx7V26wmEvb5QAErW
-  Share  2: SSS-RzBLEPKyLqrL39sAabaY7WWzg3PbKaFvbPcryu6zADjZGT5ACTjkExj
-  Share  3: SSS-RzBLNqQnKZpZ12Gu5CVQSCtuc8yMH3sgaeedCxs4h7uEz35FxRWSqDh
+Private key: 5KgkzaRPWJpM9KESerGdw1T9DNxVTATbfEwf3Wn4eaAxHZ8jBgC
+2 of 3 encoding; share set ID 3454; share length 59
+  Share  1: SSS-GKZgn3rhrMswDVGvcHQbaMxctHuC6MLWgiwgPcsCPKEChuwZBYWohN7
+  Share  2: SSS-GKZgqL2uyexsX4qvU3iCQDuXWPk8fLLHCUXJCZHNExSGZ3TeY9T69L1
+  Share  3: SSS-GKZgxuYFAsndsz4prs8RsmVjk5i9XnfZq8btfDVs94tJqsUmct9ZZGd
 
-Private key: L3dPtsJ2boms2CycFEwCi84t5Z6NieAbRECHcpUTDU97PsTj9y8c
-4 of 4 encoding; share set ID 9e73; share length 61
-  Share  1: SSS-2ZtoVyQRi8V1ajng5eQBewJqvDxSj4p9XfrPryvZEk6XvSMySgFoSvbKv
-  Share  2: SSS-2ZtoWcgHLJc7QdC7rwKojGBMjqrZYiCJWuzyXZ2Yrh5QcWfU97jTZFyry
-  Share  3: SSS-2ZtoWutspFJ9DNohXxSrQgqXWj1QsiEBCbBvSMGVNB6kk1BFFHhqr3AoJ
-  Share  4: SSS-2ZtoXjPFT6kTt9eDfE42it3sWAF4goCheBsbFDZ64wR5cXYx3Y86iNzns
+Private key: L1yT2XcuBU2jiww6acKR6M83qHNc9bkxFQJRHbpP78ikU5vVfVNF
+4 of 4 encoding; share set ID fce1; share length 61
+  Share  1: SSS-2vbwv97BurRW5Xci1tezqpoMYgXFGSoN8pNFhj9p9wv1akLxPQkYZ1Dar
+  Share  2: SSS-2vbwvZUvKPrGVe6YPQk3PCSjrfyBKBdvWPkMwLpkcZWCiGeuz9Yfov1bj
+  Share  3: SSS-2vbwwnqMLXcrY19TN1jpzCmZGiRfbWeS3kkLTLr9htzvf2qERcM8PkGrX
+  Share  4: SSS-2vbwxGGyMZmwVSqhsT7zJN2fC5RZv54Yk4VpKneqjVKmPigx4A4JWADLu
 
-BIP32 seed: 04648efeca86da6163dd47602682c281
-16 of 16 encoding; share set ID 5b40; share length 36
-  Share  1: SSS-DTfoPLLyv4PQ3BQh9uFwmxkuLmRXTebe
-  Share  2: SSS-DTfoUMW5hP54mP1trNQJ4Ypi7fWcrbxL
-  Share  3: SSS-DTfoXr4DvKU5b7Ysax14sbgfte5JW1Jp
-  Share  4: SSS-DTfoaCUnUZ9SyErUdkp9wWibNWdyA1Ey
-  Share  5: SSS-DTfodK2Lrxz8j6CaF7JfZSEvRWb7eigy
-  Share  6: SSS-DTfohBBbpzckZp3NKcmPgJZUjJ19WnWT
-  Share  7: SSS-DTfomDJFc58PwMxKFdJGUogQWcwfeyAp
-  Share  8: SSS-DTfoqthbDkmqRaU8XwhT8bTAqps312dN
-  Share  9: SSS-DTfotLKKDTHKnxe7B63HRUqscrLGDhDS
-  Share 10: SSS-DTfoxvLrxXykcpaKP1VzWDf6u8NDyRrx
-  Share 11: SSS-DTfp1GH8D1hyFiCabLAoo2boUEuwnwzq
-  Share 12: SSS-DTfp65MkFTZCNkEQsM7eT19L1CENTTyH
-  Share 13: SSS-DTfp8b8RpavAFdBmRgMcgHbmLFNu73nN
-  Share 14: SSS-DTfpD5jDU9TgdT6aYPowU4YxfrPnGwZy
-  Share 15: SSS-DTfpFyT27F4tfxXFQV5x9RzJ3Q5zgcZ5
-  Share 16: SSS-DTfpKSYF6qa32UqW8KLhtaUFT1npHhbB
+BIP32 seed: a8207b01f76a82cc5cf0ea1ec224370e
+16 of 16 encoding; share set ID 27c4; share length 36
+  Share  1: SSS-CPzbxpthnNxZQoLeGPXQTidZAkV5hPN2
+  Share  2: SSS-CPzc3Kwnx1hZEcvDicxdGthnHzACBYBB
+  Share  3: SSS-CPzc59jBF3vZoqNuTYXc9No2G4AnP1XA
+  Share  4: SSS-CPzcAYQacv8iTZpjG8yMuKinzQ3ZS2UA
+  Share  5: SSS-CPzcBLMLUYxc3KCvTpAmmRhvjGhRHQWS
+  Share  6: SSS-CPzcHPyroivuijMEJKYZLvkVUiU2R5JA
+  Share  7: SSS-CPzcKypfUqZ8HQsbx5VvmJSdZRLAzovv
+  Share  8: SSS-CPzcQZEAFfmzXNQniRLe7Rgb4GgAkcyJ
+  Share  9: SSS-CPzcRqxDaKJDKUnJU2LNcMkHvExEAaRr
+  Share 10: SSS-CPzcWoyuUpRzqxRTpWanc55FLQZum9yw
+  Share 11: SSS-CPzcZmoJSj6384SxKWyEV1aEqBe2rXE7
+  Share 12: SSS-CPzcdeAvfRMuFspoA9nXymGNfUV4whtB
+  Share 13: SSS-CPzcgKabNT3sXxVAt1v6djkffneWs6zF
+  Share 14: SSS-CPzcnXzQXSeDXbbZnQh7qnREaV2REnBM
+  Share 15: SSS-CPzcomFbmsNHjM74VZW266kfHB3f56gD
+  Share 16: SSS-CPzctt4qww7vwHdc95to8nr46wb7Qqx1
 
-BIP32 seed: 6126f07ba60866b740012cf1b88c569e705b42694b70299a4b89c036b36bc6d2
-3 of 6 encoding; share set ID 870a; share length 58
-  Share  1: SSS-8HU9SVBNGpTaDRyrH9FyuQp16koqa1kY2QDHDQsAR3B3n9NRuUpero
-  Share  2: SSS-8HU9VinANWTfHqMS1i5zXFZvraNU8M2p6f8e4WsB5XqpXhLUdayD52
-  Share  3: SSS-8HU9XmFcUZcfioeCaSChzCbfue1n2ncytPHLaqRBYz9ftFt84dzWZD
-  Share  4: SSS-8HU9YLWUDFj7kn5DUdhe13c46856pkVJF6GKYF8YDgGHDZJ12jp849
-  Share  5: SSS-8HU9asAUdUcq5vwFL5SZ3LRX9kfJLVezSFsc6833WeNeEMbKBbu44P
-  Share  6: SSS-8HU9dap8xQmWiZAF6BDEX5jgBAowu87SsD8MgUZvtumjx9DJW288XA
+BIP32 seed: b5e6838bca5aec9eb6c6e61fec32b1b56779647852f69578d97471c1936387c8
+3 of 6 encoding; share set ID d86e; share length 58
+  Share  1: SSS-9CcNxASM5gQ1EjvbxgKVafx8CMzgE8S3VH1cfPRkDEsb5DqDEHeMCb
+  Share  2: SSS-9CcNymVSADPUCfrH8FM2D73aqpQcxm9woxDNNtgdBc574x68Gfxmn1
+  Share  3: SSS-9CcP25RWAdLutZTdx8LArQoYZMA7D4h2RTcJKbBuNzGbGKS8p1nMYf
+  Share  4: SSS-9CcP2YvrxdNhU2TB8xNU8R6L2B1CGRZoLG9nyZsBHhft4gfYtU8fdD
+  Share  5: SSS-9CcP56xKM32eHVAcAscZb7MzA2L4odxcT7ngxX4QGQ9NQ9zwGKdrUd
+  Share  6: SSS-9CcP6U7bjQ4UCHyUYjrv2Mhxa35XKYpF5uRGXuaGLAgqBNtCDtSJWz
 
-BIP32 seed: edb5134d71a12238473dcf9483e6db8e5b741e9c46dc2eaf4cf7486b421c561e1e92e7c5c89512e54ad8eb7befc2019125a48292879208611259862b86be36a8
-2 of 4 encoding; share set ID 8d7a; share length 102
-  Share  1: SSS-3BkNYaWKZR2Sxnk17J2owupDEizvKaknymiXtfmgHEyboP4Fjf7fu6wV5KnXNJGPD5fPYCrejVEYxhu2rUr4C8cqRNSeTM8RZd
-  Share  2: SSS-3BkNYqD8LDcsoCSASeAdczxDkZGsX17VJdJUvLFHGsJTFTWpNrN81izoPknDdjQPiqRZx4NmYbKaHFRbLvtxtEjGTfj7ioc9b3
-  Share  3: SSS-3BkNZfJDjrwPAZUXWa9dN85czqxCGUhNRGt3NDZbxNjEkjzeGTgDAcHK2NYcydQyLWuvSaSj4qQPkRtxg8cWbcFHaUWF6ASbr1
-  Share  4: SSS-3BkNa4otYod7HZT78YBqUsCVVFRbwk1Lf3TpFaSAffEVvajSfetDvmtJ1c8R5eT9WzDB91wxySxSef3Fgqhktpy7VxPp5ot7tM
+BIP32 seed: e67be8895c6aa05aad38b5b9e1b88f03c018ec0452e424e9d44d5a110053a433e201198500064a64faf7da6d39dd103a1df377bd229112432d89b960827eb039
+2 of 4 encoding; share set ID 31ab; share length 102
+  Share  1: SSS-2swZQjerTh2ARfxf2bAtZG1qegqbS67gu8tfRLHVDjcPpQki9KhmEqsyFyH7njuHXEvSoBcp1J4zMYc9tZZDrha7MDYjrKT9Tz
+  Share  2: SSS-2swZRPnd9SujE2gqvzxeEcMeWWGLFQU4GtZjmLxsMxLkM8hoLQgGQmpZchZZf9hbUPeFy8YtAAqVBGtUd5GxJB7WQyZgrCtP8k
+  Share  3: SSS-2swZSJy24FKcSJihh7rGxtNreWr3AzHppe2e5tCxeufibRWPdVDJuWwsYdyiMpJd8sNLTRc21ymC9J2FdznTfvJjgGdrjfAEGd
+  Share  4: SSS-2swZSgNK7x66xErTj5AjkASK5MSgWgr5t9vYpF4YpiMZbzumJx3sTGh9WsyuBgr3xfLJ77qNnmnahCnhrBa4tjBMagbZBPBC6K
 </pre>
