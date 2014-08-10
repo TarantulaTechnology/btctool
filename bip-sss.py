@@ -112,10 +112,10 @@ def sha_coeff(secret, m):
     coeff = bytearray(secret)
     res = [coeff]
     for i in range(1, m):
-        ci = ""
-        for k in range(0, len(coeff), 32):
-            ci += hashlib.sha256(coeff[k : k+32]).digest()
-        coeff = bytearray(ci[:len(coeff)])
+        b = hashlib.sha256(coeff + bytearray([0])).digest()
+        while len(b) < len(coeff):
+            b += hashlib.sha256(b[-32:]).digest()
+        coeff = bytearray(b[:len(coeff)])
         res += [coeff]
     return res
 
