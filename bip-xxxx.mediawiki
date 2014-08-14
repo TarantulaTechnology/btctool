@@ -3,7 +3,8 @@
   Title: Shamir's Secret Sharing Scheme
   Author: Matt Whitlock <bip@mattwhitlock.name>,
           Nikita Schmidt,
-          Jan Møller
+          Jan Møller,
+	  Jérôme Rousselot
   Status: Draft
   Type: Informational
   Created: 28-03-2014
@@ -31,7 +32,7 @@ This proposal is hereby placed in the public domain.
 * Define '''GF'''<sup>''L''</sup> as the ''L''-dimensional vector space over '''GF''', whose elements are <!--
   --> represented as byte sequences of length ''L''.
 * Define Hash<sub>''w''</sub>(''m'') as a function that:
-*# accepts an argument ''m'', which is an sequence of bytes,
+*# accepts an argument ''m'', which is a sequence of bytes,
 *# computes the [http://en.wikipedia.org/wiki/SHA-2 SHA-256] message digest of the SHA-256 message digest of ''m'',
 *# and returns the first ''w'' bytes of the resulting digest.
 
@@ -97,15 +98,11 @@ For regular and BIP32-extended private keys, their encoded form before Base58Che
 
 == Motivation ==
 
-A common technique for protecting Bitcoin private keys is to encrypt the private key with a password, such as using [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38]. While this protects the key from anyone who cannot determine the password, it also has some significant drawbacks:
+The backup storage of Bitcoin private keys and [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seeds is of critical importance to users. Indeed, the loss of a bitcoin wallet means losing all bitcoins stored on the addresses managed by that wallet, if no backup was made. However, simply saving the private key on paper (cold storage) is not enough. What happens when this document is lost ? It may be password protected, for instance using [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38]. But what if the user selected a weak password, for instance a date of birth, so that he is sure he can remember it ? This is very common, as described in [http://research.microsoft.com/pubs/74164/www2007.pdf large-scale-study-web-passwords]. Therefore, key stretching may not be secure enough against some dictionary attacks. If the backup is lost, then the funds can be lost as well. A backup in another location is the ideal solution to this problem. But trusting a third party with a private key, even encrypted, also carries significant risk. 
 
-# The encryption is only as strong as the password chosen by the user. Human beings are notoriously bad at choosing strong random passwords, and even worse at remembering them.
-# Once the key has been encrypted with a password the user is left with two things that he has to keep safe. If one of them is lost the key is lost.
+We suggest to use Shamir's Secret Sharing scheme, as it reduces the risks associated with the loss of one of the paper backups, and with entrusting a third party with the paper backup.
 
-Shamir's Secret Sharing scheme allows you to split any secret into N shares, and set a threshold of M (1 ≤ M ≤ N)  shares that allow you to recombine the secret. A classic example is to configure M=2 and N=3, meaning that you split a secret into 3 shares, and any 2 shares can recombine the secret. When compared to the aforementioned private key encrypted by a password, it fixes both drawbacks:
-
-# There is no potentially weak human generated password.  
-# If you lose any one of the three shares due to theft, flood, or fire, you can still recreate the secret by combining the remaining two shares. If an adversary obtains one of two required shares, then the adversary has no better alternative than to brute force the secret.
+Shamir's Secret Sharing scheme allows the user to split any secret into N shares, and set a threshold of M (1 ≤ M ≤ N)  shares that allow the user to recombine the secret. A classic example is to configure M=2 and N=3, meaning that the user split a secret into 3 shares, and any 2 shares can recombine the secret. This secret may or may not be encrypted by a password. 
 
 The idea of applying Shamir's Secret Sharing Scheme to Bitcoin private keys is frequently discussed within the Bitcoin community, but there has previously existed no technical recommendation for how to generate such shares or how to encode such shares for transmission and storage. This informational BIP seeks to standardize a method and encoding scheme to enable interoperability between multiple wallet implementations that may support Shamir's Secret Sharing functionality.
 
