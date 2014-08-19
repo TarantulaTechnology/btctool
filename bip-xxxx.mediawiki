@@ -12,7 +12,7 @@
 
 == Abstract ==
 
-A method is described for decomposing a secret (which may be a Bitcoin private key, a [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seed or extended private key, or anything else) into shares in a manner such that the secret can be recovered from any sufficiently large subset of the shares but such that individually the shares do not reveal any information about the secret. This method is commonly known as Shamir's Secret Sharing Scheme, or M of N secret sharing.
+A method is described for decomposing an arbitrary secret (for example, a Bitcoin private key, a [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seed or extended private key, or anything else) into shares in a manner such that the secret can be recovered from any sufficiently large subset of the shares but such that any smaller subset does not reveal any information about the secret. This method is commonly known as Shamir's Secret Sharing Scheme, or M of N secret sharing.
 Additionally, an encoding methodology is proposed to standardize transmission and storage of shares.
 
 == Copyright ==
@@ -80,20 +80,19 @@ Values of the ''secret type byte'' are allocated as follows.
 !Value
 !Type of secret
 |-
-|align="center"|0
-|Generic data with application-specific interpretation
-|-
 |align="center"|1
-|Bitcoin private key in SIPA or BIP38 format
+|Octet string with application-specific interpretation
 |-
 |align="center"|2
-|BIP32 seed as a sequence of 16, 32 or 64 bytes, or in any recognizable encoding such as [https://bitcointalk.org/index.php?topic=258678.0 this proposal]
+|Any type of data for which a unique Base58Check encoding is specified<br/>(such as Bitcoin private key in SIPA format)
 |-
 |align="center"|3
-|BIP32 extended private key
+|BIP32 seed as a sequence of 16, 32 or 64 bytes
 |}
 
-For regular and BIP32-extended private keys, their encoded form before Base58Check is taken as the secret ''K'', including the application/version byte but excluding the checksum.  Consider for example a private key corresponding to a compressed public key:
+Type 2 provides for a universal container for any data (usually Bitcoin-related) that are usually represented in Base58.
+
+When sharing type 2 secrets, their encoded form before Base58Check is taken as the value of ''K'', including the application/version byte but excluding the checksum.  Consider for example a private key corresponding to a compressed public key:
 <div align="center">''K'' = <code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</div>
 
 == Motivation ==
@@ -124,15 +123,15 @@ A common practice is to use the application/version byte (AVB) to both identify 
 
 An earlier draft of this specification proposed GF(''P'') as the field, where ''P'' was a large prime number close to 2<sup>8''L''</sup>, specified individually for each possible value of ''L''.  In order to support arbitrary length secrets, the field was changed to GF(2<sup>8</sup>).
 
-A timestamp field was discussed, which would be useful with BIP32 payloads as the key inception time point to optimize private key import into a wallet.  However, it has no general use in the secret sharing scheme and belongs rather to the shared data.  An encoding that contains inception time, such as [https://bitcointalk.org/index.php?topic=258678.0 this one], can be used instead of the plain seed with no changes to this specification.
+A timestamp field was discussed, which would be useful with BIP32 payloads as the key inception time point to optimize private key import into a wallet.  However, it has no general use in the secret sharing scheme and belongs rather to the shared data.  An encoding that contains inception time, such as [https://bitcointalk.org/index.php?topic=258678.0 this one], can be used as a type 2 secret instead of the plain seed (type 3).
 
-== Reference Implementation ==
+== Reference Implementation: to be updated ==
 
 [https://github.com/cetuscetus/btctool/blob/bip/bip-sss.py bip-sss.py]
 
 This reference implementation is written with the aim of illustrating the algorithm and encoding scheme.  It is not optimized for any specific purpose nor does it follow any specific software development paradigm.
 
-=== Test Vectors ===
+=== Test Vectors (to be updated) ===
 
 A copy is in [https://github.com/cetuscetus/btctool/blob/bip/bip-test.txt bip-test.txt].
 
