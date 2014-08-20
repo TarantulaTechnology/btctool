@@ -160,16 +160,15 @@ def combine(gf, shares):
     return a
 
 # Secret type byte values.
-STB_DATA        = 0
-STB_PRIVATE_KEY = 1
-STB_BIP32_SEED  = 2
-STB_BIP32_XPRV  = 3
+STB_DATA        = 1
+STB_ENCODED     = 2
+STB_BIP32_SEED  = 3
 
+# Secret types used for testing.
 secret_types = {
         STB_DATA:           "Generic data",
-        STB_PRIVATE_KEY:    "Private key",
+        STB_ENCODED:        "Private key",
         STB_BIP32_SEED:     "BIP32 seed",
-        STB_BIP32_XPRV:     "BIP32 extended private key",
 }
 
 # Encode a share.
@@ -244,13 +243,13 @@ def make_secret(secret_type,
     if length == None and data == None:
         length = {
                 STB_DATA:        lambda: random.randint(0, 80),
-                STB_PRIVATE_KEY: lambda: 32,
+                STB_ENCODED:     lambda: 32,
                 STB_BIP32_SEED:  lambda: random.choice([16, 32, 64]),
-                STB_BIP32_XPRV:  "not supported yet",
         }[secret_type]()
     if data == None:
         data = [ int(random.getrandbits(8)) for i in range(length) ]
-    if secret_type == STB_PRIVATE_KEY:
+    if secret_type == STB_ENCODED:
+        # for testing, we only make private keys under this STB
         data = [ { False: 0x80, True: 0xef } [testnet] ] + data + \
                 { True: [1], False: [] } [compressed]
         text = base58check(data)
@@ -288,7 +287,8 @@ def enc_dec_test(gf, n):
     for i in range(n):
         secret_type = random.randint(STB_DATA, STB_BIP32_SEED)
         secret = make_secret(secret_type, compressed = compressed)
-        if secret_type == STB_PRIVATE_KEY:
+        if secret_type == STB_ENCODED:
+            # this STB is only used for private keys here
             compressed = not compressed
         m = random.randint(1, 16)
         n = random.randint(m, 16)
@@ -315,10 +315,10 @@ def gen_vectors():
             make_secret(STB_DATA, data=[1, 2, 3, 4, 5]))
     make_and_check(gf, STB_DATA, 5, 8,
             make_secret(STB_DATA, data=[1, 2, 3, 4, 5]))
-    make_and_check(gf, STB_PRIVATE_KEY, 2, 3,
-            make_secret(STB_PRIVATE_KEY, compressed = False))
-    make_and_check(gf, STB_PRIVATE_KEY, 4, 4,
-            make_secret(STB_PRIVATE_KEY, compressed = True))
+    make_and_check(gf, STB_ENCODED, 2, 3,
+            make_secret(STB_ENCODED, compressed = False))
+    make_and_check(gf, STB_ENCODED, 4, 4,
+            make_secret(STB_ENCODED, compressed = True))
     make_and_check(gf, STB_BIP32_SEED, 16, 16,
             make_secret(STB_BIP32_SEED, 16))
     make_and_check(gf, STB_BIP32_SEED, 3, 6,
