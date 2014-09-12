@@ -69,31 +69,14 @@ Note that although mathematically ''x'' can be any non-zero element of '''GF''',
 #* two random bytes, or
 #* Hash<sub>2</sub>(''K''),<br/>at the implementation's discretion.  Its purpose is to help identify which shares belong together.
 # For each share (''x'', ''y''(''x'')), construct a payload as follows:
-#* Byte 0 is the ''secret type byte'', as enumerated in the table below.
+#* Byte 0 is the extensible ''content type byte'', 0=Base58 and future BIPs may extend it
 #* Bytes 1 and 2 contain ''ID''.
 #* Byte 3 has the value (''M''-1)·16 + (''x''-1).
 #* The remaining bytes in the payload are the ''L'' bytes of ''y''(''x'').
-# Encode the payload using Base58Check with no application/version byte.
+# Encode the payload using Base58Check and prefix it with "SSS-".
 
-Values of the ''secret type byte'' are allocated as follows.
-{|
-!Value
-!Type of secret
-|-
-|align="center"|1
-|Octet string with application-specific interpretation
-|-
-|align="center"|2
-|Any type of data for which a Base58Check encoding is specified<br/>(such as Bitcoin private key in Wallet Import Format)
-|-
-|align="center"|3
-|BIP32 seed as a sequence of 16, 32 or 64 bytes
-|}
-
-Type 2 provides for a universal container for any data (usually Bitcoin-related) that are usually represented in Base58.
-
-When sharing type 2 secrets, their encoded form before Base58Check is taken as the value of ''K'', including the
-application/version byte but excluding the checksum.  Consider for example a private key, which is to be used with a
+Content type 0 provides for a universal container of any data represented in Base58Check encoding. <br/>(such as Bitcoin private key in Wallet Import Format)
+The secret (''K'') is the binary form of the decoded Base58Check value including any application/version byte but excluding the checksum.  Consider for example a private key, which is to be used with a
 compressed public key:
 <div align="center">''K'' = <code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</div>
 
