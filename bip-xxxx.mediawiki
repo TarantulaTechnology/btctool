@@ -22,7 +22,7 @@ This proposal is hereby placed in the public domain.
 == Specification ==
 
 * Define ''K'' as the secret, which is a sequence of bytes.
-* Define ''L'' as the length of the secret, in bytes. For an ordinary Bitcoin private key in Wallet Import Format, ''L'' = 33 or 34.
+* Define ''L'' as the length of the secret, in bytes.
 * Define 1 ≤ ''N'' ≤ 16 as the total number of shares requested.
 * Define 1 ≤ ''M'' ≤ N as the number of shares to be required when recovering the secret.
 * Define '''GF''' as the finite field of order 2<sup>8</sup>, i.e. the field of equivalence classes of <!--
