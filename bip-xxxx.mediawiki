@@ -12,7 +12,7 @@
 
 == Abstract ==
 
-A method is described for decomposing an arbitrary secret (for example, a Bitcoin private key, a [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seed or extended private key, or anything else) into shares in a manner such that the secret can be recovered from any sufficiently large subset of the shares but such that any smaller subset does not reveal any information about the secret. This method is commonly known as Shamir's Secret Sharing Scheme, or M of N secret sharing.
+A method is described for decomposing an arbitrary secret (for example, a Bitcoin private key, a [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] extended private key, or anything else) into shares in a manner such that the secret can be recovered from any sufficiently large subset of the shares but such that any smaller subset does not reveal any information about the secret. This method is commonly known as Shamir's Secret Sharing Scheme, or M of N secret sharing.
 Additionally, an encoding methodology is proposed to standardize transmission and storage of shares.
 
 == Copyright ==
