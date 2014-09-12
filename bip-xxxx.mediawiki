@@ -104,11 +104,11 @@ It is anticipated that 16 shares will be enough for most applications of Shamir'
 
 Each share encodes the content type, which is extensible in future BIPs. So far the content type is limited to Base58. Applications supporting this BIP can use conventional Base58 prefix detection to determine how to handle the payload). By supporting Base58 content this specification builds on top of several actual and de facto standards with Bitcoin today, including WIF private keys, BIP32 extended private keys, and BIP38 encrypted private keys.
 
-Each share in a set of compatible shares encode the same random identifier which allows software to guide the user when importing shares. This dramatically reduces the probability of user attempting to combine incompatible shares.
+Each share in a set of compatible shares encode the same random identifier ''ID'' which allows software to guide the user when importing shares. This dramatically reduces the probability of user attempting to combine incompatible shares.
 
-Each share encodes the number of shares necessary to combine the secret. This allows software to tell the user how many shares he should collect. 
+Each share encodes the number ''M'' of shares necessary to combine the secret. This allows software to tell the user how many shares he should collect. 
 
-Each share in a set of compatible shares have a unique serial number x ≤ M. This allows software to guide the user which shares to pick, and prevents that the same share is applied twice, yielding a wrong result.
+Each share in a set of compatible shares have a unique serial number ''x'' ≤ ''M''. This allows software to guide the user which shares to pick, and prevents that the same share is applied twice, yielding a wrong result.
 
 A common practice is to use the application/version byte (AVB) to both identify the type of payload and force the initial character/s in the Base58Check encoding to a specific prefix, aiding visual recognition of different types of encoded data.  However, the latter is only possible with fixed length payloads.  To preserve both functions of the AVB, this specification proposes to effectively move it outside of the binary payload by attaching the 'SSS-' prefix to the Base58Check encoded string.
 
