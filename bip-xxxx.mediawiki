@@ -90,7 +90,7 @@ Storing plaintext private keys has the obvious drawback that anyone who sees it 
 
 Storing password encrypted private keys has another drawback. You turn your private key into two components, where both are needed to reveal the private key. While you prevent someone getting one component from revealing the private key, you make it more likely that you loose control over your private key yourself. If you lose one component due to flood, theft, or fire, you lost control over your private key.
 
-With this BIP we propose to standardize longterm storage of secrets using an M of N secret sharing scheme commonly known as Shamir's Secret Sharing. The secret is split into N shares where any M of those shares reveal the secret. N and M can freely be chosen as long as 1 <= M <=N <= 16. A classic example is to configure M=2 and N=3, meaning that the user splits a secret into 3 shares, and any 2 shares can recombine the secret. This means that if any one share is stolen or lost you can reconstruct the secret by the remaining two shares. On the other hand, an adversary with one share can reveal nothing about the secret. If you choose M=2 and N=2 you have a setting comparable with classic password encrypted private keys, with the added benefit that both components are equally strong.
+With this BIP we propose to standardize longterm storage of secrets using an M of N secret sharing scheme commonly known as Shamir's Secret Sharing. The secret is split into N shares where any M of those shares reveal the secret. N and M can freely be chosen as long as 1 ≤M ≤ N ≤ 16. A classic example is to configure M=2 and N=3, meaning that the user splits a secret into 3 shares, and any 2 shares can recombine the secret. This means that if any one share is stolen or lost you can reconstruct the secret by the remaining two shares. On the other hand, an adversary with one share can reveal nothing about the secret. If you choose M=2 and N=2 you have a setting comparable with classic password encrypted private keys, with the added benefit that both components are equally strong.
 
 === This is not Multi-Sig ===
 
@@ -108,7 +108,7 @@ Each share in a set of compatible shares encode the same random identifier which
 
 Each share encodes the number of shares necessary to combine the secret. This allows software to tell the user how many shares he should collect. 
 
-Each share in a set of compatible shares have a unique serial number x <= M. This allows software to guide the user which shares to pick, and prevents that the same share is applied twice, yielding a wrong result.
+Each share in a set of compatible shares have a unique serial number x ≤ M. This allows software to guide the user which shares to pick, and prevents that the same share is applied twice, yielding a wrong result.
 
 A common practice is to use the application/version byte (AVB) to both identify the type of payload and force the initial character/s in the Base58Check encoding to a specific prefix, aiding visual recognition of different types of encoded data.  However, the latter is only possible with fixed length payloads.  To preserve both functions of the AVB, this specification proposes to effectively move it outside of the binary payload by attaching the 'SSS-' prefix to the Base58Check encoded string.
 
