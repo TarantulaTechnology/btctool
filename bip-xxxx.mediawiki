@@ -75,10 +75,12 @@ Note that although mathematically ''x'' can be any non-zero element of '''GF''',
 #* The remaining bytes in the payload are the ''L'' bytes of ''y''(''x'').
 # Encode the payload using Base58Check and prefix it with "SSS-".
 
-Content type 0 provides for a universal container of any data represented in Base58Check encoding. <br/>(such as Bitcoin private key in Wallet Import Format)
+Content type 0 provides for a universal container of any data represented in Base58Check encoding (such as Bitcoin private key in Wallet Import Format).
 The secret (''K'') is the binary form of the decoded Base58Check value including any application/version byte but excluding the checksum.  Consider for example a private key, which is to be used with a
 compressed public key:
 <div align="center">''K'' = <code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</div>
+
+In effect a collection M of shares is a wrapper around a Base58Check value, without the overhead of encoding Base58Check twice.
 
 == Motivation ==
 
