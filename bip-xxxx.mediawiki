@@ -102,7 +102,7 @@ This specification is not a replacement for multi-sig transactions. Rather it pr
 
 It is anticipated that 16 shares will be enough for most applications of Shamir's Secret Sharing Scheme. Thus, ''M'' and ''x'' are allocated 4 bits each.
 
-Each share encodes the content type, which is extensible in future BIPs. So far the content type is limited to Base58. Applications supporting this BIP can use conventional Base58 prefix detection to determine how to handle the payload (e.g. SIPA formatted private keys, BIP38 encrypted private keys, or BIP32 extended private keys). By supporting Base58 content this specification builds on top of several actual and de facto standards with Bitcoin today, including WIF private keys, BIP32 extended private keys, and BIP38 encrypted private keys.
+Each share encodes the content type, which is extensible in future BIPs. So far the content type is limited to Base58. Applications supporting this BIP can use conventional Base58 prefix detection to determine how to handle the payload). By supporting Base58 content this specification builds on top of several actual and de facto standards with Bitcoin today, including WIF private keys, BIP32 extended private keys, and BIP38 encrypted private keys.
 
 Each share in a set of compatible shares encode the same random identifier which allows software to guide the user when importing shares. This dramatically reduces the probability of user attempting to combine incompatible shares.
 
