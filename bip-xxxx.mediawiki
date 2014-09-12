@@ -84,33 +84,37 @@ In effect a collection M of shares is a wrapper around a Base58Check value, with
 
 == Motivation ==
 
-The backup storage of Bitcoin private keys and [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seeds is of critical importance to users. Indeed, the loss of a bitcoin wallet means losing all bitcoins stored on the addresses managed by that wallet, if no backup was made. However, simply saving the private key on paper (cold storage) is not enough. What happens when this document is lost ? It may be password protected, for instance using [https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki BIP38]. But what if the user selected a weak password, for instance a date of birth, so that he is sure he can remember it ? This is very common, as described in [http://research.microsoft.com/pubs/74164/www2007.pdf large-scale-study-web-passwords]. Therefore, key stretching may not be secure enough against some dictionary attacks. If the backup is lost, then the funds can be lost as well. A backup in another location is the ideal solution to this problem. But trusting a third party with a private key also carries significant risk.
+Secure longterm backup and storage of secrets is of particular importance to Bitcoin users. So far various techniques have been used including storing plain text private and password encrypted private keys on paper.
 
-We suggest to use Shamir's Secret Sharing scheme, as it reduces the risks associated with the loss of one of the paper backups, and with entrusting a third party with the paper backup.
+Storing plaintext private keys has the obvious drawback that anyone who sees it can steal your funds.
 
-Shamir's Secret Sharing scheme allows the user to split any secret into N shares, and set a threshold of M (1 ≤ M ≤ N)  shares that allow the user to recombine the secret. A classic example is to configure M=2 and N=3, meaning that the user split a secret into 3 shares, and any 2 shares can recombine the secret. This secret can be encrypted by a password, although this is not required.
+Storing password encrypted private keys has another drawback. You turn your private key into two components, where both are needed to reveal the private key. While you prevent someone getting one component from revealing the private key, you make it more likely that you loose control over your private key yourself. If you lose one component due to flood, theft, or fire, you lost control over your private key.
 
-The idea of applying Shamir's Secret Sharing Scheme to Bitcoin private keys is frequently discussed within the Bitcoin community, but there has previously existed no technical recommendation for how to generate such shares or how to encode such shares for transmission and storage. This informational BIP seeks to standardize a method and encoding scheme to enable interoperability between multiple wallet implementations that may support Shamir's Secret Sharing functionality.
+With this BIP we propose to standardize longterm storage of secrets using an M of N secret sharing scheme commonly known as Shamir's Secret Sharing. The secret is split into N shares where any M of those shares reveal the secret. N and M can freely be chosen as long as 1 <= M <=N <= 16. A classic example is to configure M=2 and N=3, meaning that the user splits a secret into 3 shares, and any 2 shares can recombine the secret. This means that if any one share is stolen or lost you can reconstruct the secret by the remaining two shares. On the other hand, an adversary with one share can reveal nothing about the secret. If you choose M=2 and N=2 you have a setting comparable with classic password encrypted private keys, with the added benefit that both components are equally strong.
 
 === This is not Multi-Sig ===
 
 Bitcoin supports two multi-signature schemes ([https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki BIP11], [https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki BIP16]), in which redeeming transaction outputs requires signatures by multiple private keys.
 
-This specification is not a replacement for multi-sig transactions. Rather it provides a secure mechanism for storing and protecting private keys and [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki BIP32] master seeds, which in turn can be used for multi-signature or classic transactions.
+This specification is not a replacement for multi-sig transactions. Rather it provides a secure mechanism for storing and protecting private keys or potentially master seeds, which in turn can be used for multi-signature or classic transactions.
 
 == Rationale ==
 
 It is anticipated that 16 shares will be enough for most applications of Shamir's Secret Sharing Scheme. Thus, ''M'' and ''x'' are allocated 4 bits each.
 
-The ''ID'' and ''M'' fields are located at the beginning of the payload so that all shares for a given secret will share a common prefix and thus can be visually associated.  It can be argued that their inclusion can assist an attacker.  However, this information is essential for secret recovery: the user must know which shares to combine and in what quantity.  If this is not contained in the shares, the user will need to find alternative means of recording this information out-of-band, for example, by writing it down next to each share or memorizing it.  This is inconvenient and/or risky for the user and/or helpful for the attacker in a similar way PINs and passwords are.  The point of Shamir's secret sharing, on the opposite, is to provide a safe, secure and convenient way to keep a secret without passwords.
+Each share encodes the content type, which is extensible in future BIPs. So far the content type is limited to Base58. Applications supporting this BIP can use conventional Base58 prefix detection to determine how to handle the payload (e.g. SIPA formatted private keys, BIP38 encrypted private keys, or BIP32 extended private keys). By supporting Base58 content this specification builds on top of several actual and de facto standards with Bitcoin today, including WIF private keys, BIP32 extended private keys, and BIP38 encrypted private keys.
 
-No provision has been made to make ''ID'' and ''M'' optional.  This is to reduce implementation burden associated with the complex logic required to handle cases when either or both are omitted, particularly in applications with a focus on user interface.
+Each share in a set of compatible shares encode the same random identifier which allows software to guide the user when importing shares. This dramatically reduces the probability of user attempting to combine incompatible shares.
+
+Each share encodes the number of shares necessary to combine the secret. This allows software to tell the user how many shares he should collect. 
+
+Each share in a set of compatible shares have a unique serial number x <= M. This allows software to guide the user which shares to pick, and prevents that the same share is applied twice, yielding a wrong result.
 
 A common practice is to use the application/version byte (AVB) to both identify the type of payload and force the initial character/s in the Base58Check encoding to a specific prefix, aiding visual recognition of different types of encoded data.  However, the latter is only possible with fixed length payloads.  To preserve both functions of the AVB, this specification proposes to effectively move it outside of the binary payload by attaching the 'SSS-' prefix to the Base58Check encoded string.
 
 An earlier draft of this specification proposed GF(''P'') as the field, where ''P'' was a large prime number close to 2<sup>8''L''</sup>, specified individually for each possible value of ''L''.  In order to support arbitrary length secrets, the field was changed to GF(2<sup>8</sup>).
 
-A timestamp field was discussed, which would be useful with BIP32 payloads as the key inception time point to optimize private key import into a wallet.  However, it has no general use in the secret sharing scheme and belongs rather to the shared data.  An encoding that contains inception time, e.g. as [https://bitcointalk.org/index.php?topic=258678.0 proposed by J.-P. Kogelman and W. Yager], can be used as a type 2 secret instead of the plain seed (type 3).
+A timestamp field was discussed, which would be useful to determine the key inception time point to optimize private key import into a wallet.  However, it has no general use in the secret sharing scheme and belongs rather to the payload data.  An encoding that contains inception time, e.g. as [https://bitcointalk.org/index.php?topic=258678.0 proposed by J.-P. Kogelman and W. Yager], canbe used as the content payload.
 
 == Reference Implementation ==
 
