@@ -132,7 +132,6 @@ This reference implementation is written with the aim of illustrating the algori
 
 A copy is in [https://github.com/cetuscetus/btctool/blob/bip/bip-test.txt bip-test.txt].
 
-Note: the <code><pre></code> tag appears to be broken, hence the messed-up text below.
 <pre>
 Secret: (empty)
 2 of 2 encoding; share set ID 5df6; share length 15
