@@ -40,18 +40,21 @@ This proposal is hereby placed in the public domain.
 
 # Compute ''a''<sub>0</sub>, ''a''<sub>1</sub>, …, ''a''<sub>''M''-1</sub> &isin; '''GF'''<sup>''L''</sup> <!--
   --> such that ''a''<sub>0</sub> = ''K'' and all ''a''<sub>''j''</sub> are unpredictable to anyone who <!--
-  --> does not know ''K'' or Hash<sub>2</sub>(''K''). <br /><!--
+  --> does not know ''K'', but knows Hash<sub>2</sub>(''K'') and some parts of ''a''. <br /><!--
   --> Implementations may use random numbers, for example.  If a deterministic algorithm is desired so that <!--
   --> additional shares can be issued which are compatible with the previous shares for the same secret, then <!--
   --> <br/>for each ''i'' from 1 to ''M''-1:
-## let ''b''<sub>''i'',0</sub> := SHA-256(''a''<sub>''i''-1</sub> || 0),<br/>where || denotes concatenation and 0 is a zero byte
-## for each ''j'' from 1 to (''L''-1) / 32: let ''b''<sub>''i'',''j''</sub> := SHA-256(''b''<sub>''i'',''j''-1</sub>)
+## for each ''j'' from 0 to (''L''-1) / 32:
+##* let ''b''<sub>''i'',''j''</sub> := SHA-256(''K'' || ''i'' || ''j''),<!--
+  --> <br/>where || denotes concatenation, and numbers ''i'' and ''j'' are represented as implementation-defined byte sequences for concatenation (e.g. as single bytes with the corresponding values)
 ## let ''a''<sub>''i''</sub> be the first ''L'' bytes of ''b''<sub>''i'',0</sub> || … || ''b''<sub>''i'',(''L''-1)/32</sub>
 # Let ''y''(''x'') := ''a''<sub>0</sub>·''x''<sup>0</sup> + ''a''<sub>1</sub>·''x''<sup>1</sup> + … <!--
   --> + ''a''<sub>''M''−1</sub>·''x''<sup>''M''−1</sup> in '''GF'''<sup>''L''</sup> <!--
   --> for ''x'' &isin; '''GF''', 1 ≤ ''x'' ≤ 16.
 # The shares are the ordered pairs (''x'', ''y''(''x'')).
 Note that although mathematically ''x'' can be any non-zero element of '''GF''', i.e. between 1 and 255, our chosen encoding limits it to the maximum of 16.
+
+'''Do not use deterministic coefficients with short secrets.'''  Note that the strength of the deterministic coefficient generation algorithm is the same as the strength of the secret.  When sharing a short secret which is intended as an input to a key extension function of high complexity, such as scrypt, a brute force attack on the coefficients derived from the secret is much faster than an attack on the secret itself, even if the attacker knows only one share.
 
 === Recovery of Secret from Shares ===
 
@@ -76,11 +79,11 @@ Note that although mathematically ''x'' can be any non-zero element of '''GF''',
 # Encode the payload using Base58Check and prefix it with "SSS-".
 
 Content type 0 provides for a universal container of any data represented in Base58Check encoding (such as Bitcoin private key in Wallet Import Format).
-The secret (''K'') is the binary form of the decoded Base58Check value including any application/version byte but excluding the checksum.  Consider for example a private key, which is to be used with a
+The secret (''K'') is the binary form of the decoded Base58Check value excluding the checksum.  Consider for example a Bitcoin private key, which is to be used with a
 compressed public key:
 <div align="center">''K'' = <code>0x80</code> &lt;private key bytes in big endian order&gt; <code>0x01</code>.</div>
 
-In effect a collection M of shares is a wrapper around a Base58Check value, without the overhead of encoding Base58Check twice.
+In effect a collection of shares is a wrapper around a Base58Check value, without the overhead of encoding Base58Check twice.
 
 == Motivation ==
 
