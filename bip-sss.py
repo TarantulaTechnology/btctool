@@ -2,10 +2,14 @@
 #
 # Shamir's Secret Sharing proposed BIP.
 # Reference implementation.
+# This program is hereby placed in the public domain.
 
 import hashlib
 import binascii
-import random           # only when random coefficients are requested
+import random
+
+# Content type byte value.
+CTB_BASE58      = 19
 
 # Galois field GF(2^8)
 class GF:
@@ -109,14 +113,15 @@ def unbase58(e):
 
 # Generate coefficients with a deterministic algorithm using SHA-256.
 def sha_coeff(secret, m):
-    coeff = bytearray(secret)
-    res = [coeff]
+    secret = bytearray(secret)
+    res = [secret]
     for i in range(1, m):
-        b = hashlib.sha256(coeff + bytearray([0])).digest()
-        while len(b) < len(coeff):
-            b += hashlib.sha256(b[-32:]).digest()
-        coeff = bytearray(b[:len(coeff)])
-        res += [coeff]
+        j = 0
+        coeff = ""
+        while len(coeff) < len(secret):
+            coeff += hashlib.sha256(secret + bytearray([i, j])).digest()
+            j += 1
+        res += [bytearray(coeff[:len(secret)])]
     return res
 
 # Generate random coefficients.
@@ -159,29 +164,17 @@ def combine(gf, shares):
         a = gf.vadd(a, gf.vmul(share, lc))
     return a
 
-# Secret type byte values.
-STB_DATA        = 1
-STB_ENCODED     = 2
-STB_BIP32_SEED  = 3
-
-# Secret types used for testing.
-secret_types = {
-        STB_DATA:           "Generic data",
-        STB_ENCODED:        "Private key",
-        STB_BIP32_SEED:     "BIP32 seed",
-}
-
 # Encode a share.
 # Parameters:
-#   secret_type:        one of the values listed above
+#   content_type:       one of CTB_xxx values, currently always 19
 #   share_set_id:       two bytes identifying this set of shares
-def encode(share, secret_type, m, share_set_id):
+def encode(share, content_type, m, share_set_id):
     x, share = share
 
     assert x >= 1 and x <= 16
     assert m >= 1 and m <= 16
 
-    return "SSS-" + base58check([secret_type]
+    return "SSS-" + base58check([content_type]
                               + list(share_set_id)
                               + [(m-1) << 4 | (x-1)]
                               + list(share))
@@ -191,35 +184,36 @@ def decode(text):
     assert text[:4] == "SSS-"
 
     b = unbase58(text[4:])
-    secret_type = b[0]
+    content_type = b[0]
     share_set_id = b[1:3]
     m = (b[3] >> 4) + 1
     x = (b[3] & 0xF) + 1
     share = x, b[4:]
 
-    #print secret_types[secret_type], "ID", binascii.hexlify(share_set_id) + ",",
+    #print content_types[content_type], "ID", binascii.hexlify(share_set_id) + ",",
     #print "M = %d, x = %d" % (m, x)
 
-    return share, m, share_set_id, secret_type
+    return share, m, share_set_id, content_type
 
-# Make an M-of-N set of shares using hash-based IDs.
-def make_set(gf, secret_type, m, n, secret, gen_coeff = sha_coeff):
-    assert m >= 1 and m <= 16
+# Make an M-of-N set of shares
+def make_set(gf, content_type, m, n, secret, gen_coeff = sha_coeff, set_id = None):
     assert n >= 1 and n <= 16
+    assert m >= 1 and m <= n
 
-    share_set_id = double_sha(secret)[:2]
+    if not set_id:
+        set_id = double_sha(secret)[:2]
     coeff = gen_coeff(secret, m)
 
     shares = [ (x, bytearray(make_share(gf, x, coeff))) for x in range(1, n+1) ]
-    enc = [ encode(share, secret_type, m, share_set_id) for share in shares ]
+    enc = [ encode(share, content_type, m, set_id) for share in shares ]
 
     print "%d of %d encoding; share set ID %s; share length %d" % (m, n,
-            binascii.hexlify(share_set_id), len(enc[0]))
+            binascii.hexlify(set_id), len(enc[0]))
 
     return shares, enc
 
-def make_and_check(gf, secret_type, m, n, secret, gen_coeff = sha_coeff):
-    shares, enc = make_set(gf, secret_type, m, n, secret, gen_coeff)
+def make_and_check(gf, content_type, m, n, secret, gen_coeff = sha_coeff, set_id = None):
+    shares, enc = make_set(gf, content_type, m, n, secret, gen_coeff, set_id)
     set_id = None
     for i, enc_share in enumerate(enc):
         share, dec_m, dec_id, dec_type = decode(enc_share)
@@ -228,38 +222,37 @@ def make_and_check(gf, secret_type, m, n, secret, gen_coeff = sha_coeff):
         assert set_id == None or dec_id == set_id
         set_id = dec_id
         # check that everything else is good
-        assert dec_m == m and dec_type == secret_type
+        assert dec_m == m and dec_type == content_type
         assert share == shares[i]
     xxx = range(n)
     random.shuffle(xxx)
     combined = combine(gf, [ shares[i] for i in xxx[:m] ])
     assert combined == secret
 
-def make_secret(secret_type,
+def make_secret(content_type,
                 length = None,          # will be random if not given
                 data = None,            # will be random if not given
+                is_private_key = False,
                 compressed = True,      # for regular private key
                 testnet = False):
+    print
     if length == None and data == None:
-        length = {
-                STB_DATA:        lambda: random.randint(0, 80),
-                STB_ENCODED:     lambda: 32,
-                STB_BIP32_SEED:  lambda: random.choice([16, 32, 64]),
-        }[secret_type]()
+        if is_private_key:
+            length = 32
+        else:
+            length = random.randint(0, 80)
     if data == None:
         data = [ int(random.getrandbits(8)) for i in range(length) ]
-    if secret_type == STB_ENCODED:
-        # for testing, we only make private keys under this STB
+    if is_private_key:
+        # encode in WIF (SIPA format)
         data = [ { False: 0x80, True: 0xef } [testnet] ] + data + \
                 { True: [1], False: [] } [compressed]
-        text = base58check(data)
+        print "Private key:", base58check(data)
+    if data:
+        text = binascii.hexlify(bytearray(data))
     else:
-        if data:
-            text = binascii.hexlify(bytearray(data))
-        else:
-            text = "(empty)"
-    print
-    print secret_types[secret_type] + ": " + text
+        text = "(empty)"
+    print "Secret: " + text
     return list(data)
 
 def sss_test(gf, q, m):
@@ -282,17 +275,17 @@ def sss_test(gf, q, m):
             print "Share %d:" % x, list(s)
         print "- result", combined
 
-def enc_dec_test(gf, n):
+def enc_dec_test(gf, count):
     compressed = False
-    for i in range(n):
-        secret_type = random.randint(STB_DATA, STB_BIP32_SEED)
-        secret = make_secret(secret_type, compressed = compressed)
-        if secret_type == STB_ENCODED:
-            # this STB is only used for private keys here
+    for i in range(count):
+        is_private_key = (i & 3) == 0
+        secret = make_secret(CTB_BASE58, is_private_key = is_private_key, compressed = compressed)
+        if is_private_key:
+            # make sure we do both compressed and uncompressed private keys
             compressed = not compressed
         m = random.randint(1, 16)
         n = random.randint(m, 16)
-        make_and_check(gf, secret_type, m, n, secret,
+        make_and_check(gf, CTB_BASE58, m, n, secret,
                 random.choice([ random_coeff, sha_coeff ]))
 
 
@@ -309,22 +302,22 @@ def test():
 
 def gen_vectors():
     gf = GF(0x11d)
-    make_and_check(gf, STB_DATA, 2, 2, make_secret(STB_DATA, 0))
-    make_and_check(gf, STB_DATA, 2, 3, make_secret(STB_DATA, data=[42]))
-    make_and_check(gf, STB_DATA, 1, 1,
-            make_secret(STB_DATA, data=[1, 2, 3, 4, 5]))
-    make_and_check(gf, STB_DATA, 5, 8,
-            make_secret(STB_DATA, data=[1, 2, 3, 4, 5]))
-    make_and_check(gf, STB_ENCODED, 2, 3,
-            make_secret(STB_ENCODED, compressed = False))
-    make_and_check(gf, STB_ENCODED, 4, 4,
-            make_secret(STB_ENCODED, compressed = True))
-    make_and_check(gf, STB_BIP32_SEED, 16, 16,
-            make_secret(STB_BIP32_SEED, 16))
-    make_and_check(gf, STB_BIP32_SEED, 3, 6,
-            make_secret(STB_BIP32_SEED, 32))
-    make_and_check(gf, STB_BIP32_SEED, 2, 4,
-            make_secret(STB_BIP32_SEED, 64))
+    make_and_check(gf, CTB_BASE58, 2, 2, make_secret(CTB_BASE58, 0))
+    make_and_check(gf, CTB_BASE58, 2, 3, make_secret(CTB_BASE58, data=[42]))
+    make_and_check(gf, CTB_BASE58, 1, 1,
+            make_secret(CTB_BASE58, data=[1, 2, 3, 4, 5]), set_id="\x12\x34")
+    make_and_check(gf, CTB_BASE58, 5, 8,
+            make_secret(CTB_BASE58, data=[1, 2, 3, 4, 5]), set_id="XQ")
+    make_and_check(gf, CTB_BASE58, 2, 3,
+            make_secret(CTB_BASE58, is_private_key = True, compressed = False))
+    make_and_check(gf, CTB_BASE58, 4, 4,
+            make_secret(CTB_BASE58, is_private_key = True, compressed = True))
+    make_and_check(gf, CTB_BASE58, 16, 16,
+            make_secret(CTB_BASE58, 16))
+    make_and_check(gf, CTB_BASE58, 3, 6,
+            make_secret(CTB_BASE58, 32))
+    make_and_check(gf, CTB_BASE58, 2, 4,
+            make_secret(CTB_BASE58, 64))
 
 
 #test()
