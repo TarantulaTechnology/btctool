@@ -86,7 +86,7 @@ Other types of content can be added in future by allocating different values for
 
 Note the following rules for establishing whether two shares ''A'' and ''B'' may be combinable, i.e. may belong to the same share set:
 * if (''CTB'', ''ID'', ''M'', ''L'')<sub>''A''</sub> ≠ (''CTB'', ''ID'', ''M'', ''L'')<sub>''B''</sub>, the shares are not combinable
-* if ''x''<sub>''A'' = ''x''<sub>''B'', but the shares are different, then they are not combinable.
+* if ''x''<sub>''A''</sub> = ''x''<sub>''B''</sub>, but the shares are different, then they are not combinable.
 
 == Motivation ==
 
@@ -132,6 +132,7 @@ This reference implementation is written with the aim of illustrating the algori
 
 A copy is in [https://github.com/cetuscetus/btctool/blob/bip/bip-test.txt bip-test.txt].
 
+Note: the <code><pre></code> tag appears to be broken, hence the messed-up text below.
 <pre>
 Secret: (empty)
 2 of 2 encoding; share set ID 5df6; share length 15
