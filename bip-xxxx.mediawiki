@@ -120,7 +120,7 @@ A common practice is to use the application/version byte (AVB) to both identify 
 
 An earlier draft of this specification proposed GF(''P'') as the field, where ''P'' was a large prime number close to 2<sup>8''L''</sup>, specified individually for each possible value of ''L''.  In order to support arbitrary length secrets, the field was changed to GF(2<sup>8</sup>).
 
-A timestamp field was discussed, which would be useful to determine the key inception time point to optimize private key import into a wallet.  However, it has no general use in the secret sharing scheme and belongs rather to the payload data.  An encoding that contains inception time, e.g. as [https://bitcointalk.org/index.php?topic=258678.0 proposed by J.-P. Kogelman and W. Yager], canbe used as the content payload.
+A timestamp field was discussed, which would be useful to determine the key inception time point to optimize private key import into a wallet.  However, it has no general use in the secret sharing scheme and belongs rather to the payload data.  An encoding that contains inception time, e.g. as [https://bitcointalk.org/index.php?topic=258678.0 proposed by J.-P. Kogelman and W. Yager], can be used as the content payload.
 
 == Reference Implementation ==
 
@@ -133,5 +133,79 @@ This reference implementation is written with the aim of illustrating the algori
 A copy is in [https://github.com/cetuscetus/btctool/blob/bip/bip-test.txt bip-test.txt].
 
 <pre>
+Secret: (empty)
+2 of 2 encoding; share set ID 5df6; share length 15
+  Share  1: SSS-4EtJVAbu6g9
+  Share  2: SSS-4EtJVHFLUQ7
 
+Secret: 2a
+2 of 3 encoding; share set ID ff12; share length 16
+  Share  1: SSS-FmEQ1wApUkUA
+  Share  2: SSS-FmEQ2TkajyyQ
+  Share  3: SSS-FmEQ2yQJjYme
+
+Secret: 0102030405
+1 of 1 encoding; share set ID 1234; share length 22
+  Share  1: SSS-2b8cxNvVnwSHzDKPr3
+
+Secret: 0102030405
+5 of 8 encoding; share set ID 5851; share length 22
+  Share  1: SSS-2cTMvHxbT71LzEzbfi
+  Share  2: SSS-2cTMvNxxgQ3Hcg1Bab
+  Share  3: SSS-2cTMvRAx1uoJ6T9Fz5
+  Share  4: SSS-2cTMvSXoCxpjcMFhvb
+  Share  5: SSS-2cTMvVpRNubeWKfbKS
+  Share  6: SSS-2cTMvaEr6YefknXEV4
+  Share  7: SSS-2cTMvdkULmYJVobgaW
+  Share  8: SSS-2cTMvh5uxQ4SavKAkh
+
+Private key: 5KG12Hn1g33JEFwdFsbjW4Hzi2fqdsEKZTtcJ3q9L6QFLvL1UJS
+Secret: 80be1583452771c1def6789be9ab5086bf3c18dd47aa99d785056ba330bcda7aaf
+2 of 3 encoding; share set ID 20ba; share length 60
+  Share  1: SSS-5CJkUwdiUPZi2R8RJJzkUFvs1TWC22JAQD2T3QMyhuAvDgzrXKuhT5at
+  Share  2: SSS-5CJkUyu8LAq7Newbgpc58SKsuNXvQyxAtnYzVjU1bRhF5hFYyvYaKToq
+  Share  3: SSS-5CJkVAkE319sk7FZVnoUgaqge6vmK1bLXwN2mm9d3VgM5hzm6qdh5TrX
+
+Private key: L2AW1Gz2962jcDY5gY1xjuep3fEbkpr3pLody77hUVm3x2MsTBPw
+Secret: 809389201df51c18a6c81b1a5525189a20cb58ddcffbd8d28b6b30dcc43a082fb101
+4 of 4 encoding; share set ID bf09; share length 61
+  Share  1: SSS-L7d2zGTyrAkwk2BESS1ksfA3ejFHhyBrPUp8M3gTgzj6XH7r7rTvEZkks
+  Share  2: SSS-L7d2zWZue1HrHVYfbVxoqZYXpfW2W3LN3nySsNSCzHGf1Kzd7UuGyBoKk
+  Share  3: SSS-L7d31V9hWyRDRi37KMA8tR6ujJJRVcbvwaANiTNSMykkki8ymQfznBE7E
+  Share  4: SSS-L7d32LG8vunr4bPjNkp1gwjZ4MxdgL7MLPpg87irEh4TQShCR5QFshCx2
+
+Secret: 7f34fc0d96fe07c01e28b183a5711805
+16 of 16 encoding; share set ID 6b91; share length 37
+  Share  1: SSS-2mghkBRhDnYVjuy9JkUN9SMWEQfFeizsE
+  Share  2: SSS-2mghkFR2Fm7psBGPYC5EAUSG12QjgytWq
+  Share  3: SSS-2mghkHpD5x8D6t1CitLCgNxPzRxna7Dy3
+  Share  4: SSS-2mghkQUfD3xh51X8ZKWKG5kfD5UGtB3YW
+  Share  5: SSS-2mghkTDKSbL766zz4GDLHiK1LdQR5hQYo
+  Share  6: SSS-2mghkUTqvgNqEPVMnVP7eNT5UfJ39GVv2
+  Share  7: SSS-2mghkZgCcPUhDY9wagDry9kF32fEkYDdN
+  Share  8: SSS-2mghkbtcpPWx6Y2g4k7t8feZ2UX71AAUN
+  Share  9: SSS-2mghkhWxkj6oBWvQwXpXQVaDEZzCefrn7
+  Share 10: SSS-2mghkmwiADHSYZwokYBMEtkJRm53xUPcH
+  Share 11: SSS-2mghkqSiSaiPMp9R81A7yCeojoQnhbkuK
+  Share 12: SSS-2mghktFpVoXVKVLLrDVNRryYQwxJEzMKX
+  Share 13: SSS-2mghkuYfqfAheZu6ywXfGoFmwxnqw64yw
+  Share 14: SSS-2mghkzvNoX6AupKpt9n9PVRMgZ6FPUSLe
+  Share 15: SSS-2mghm2UGDwYuVYTSx9YYiYDCzeCmS2XGH
+  Share 16: SSS-2mghm6ePLVPJQhsryzUfst9RWochCXK5j
+
+Secret: c71da0d239ee672c76b7ff8dec1c6b1b39b839fd22cde8732f0fa7e70f059ad2
+3 of 6 encoding; share set ID a53f; share length 58
+  Share  1: SSS-ycigiEv2xRyozNqze5bxgRJZ57wCDEZrU6LJ3v4d2BWQWysFQNZ53D
+  Share  2: SSS-ycigjnVFuh8u794S3f3f7EZoRgj2dqCmYpscV5dA8z5wJNB8arsZv6
+  Share  3: SSS-ycigoVLiJH82E8kyVkYvWQFxqTN6RDXyDjnKzhpNx4y6nXVTYyQCZF
+  Share  4: SSS-ycigq46qLhY1bqnNvd3AASmeFNVuoFn8qZqhCcZZiNysdwRTLu2sYN
+  Share  5: SSS-ycigqxtDnEmRpMsaXmnXijcUB4UaLVU8H5FppscnFX81sSFACHYvv6
+  Share  6: SSS-ycigsaS8umN5j1d8gXzaGrEysv68oqSopwd1sXA9VsW9FjfWbhJDd9
+
+Secret: ea1bef413e406b7a39280a39bf8ea76b59a4543f3f1797cfb90d33492b3eb57cf05c9cbce61ecff3854028c045049cdf0ba97cd18cbfa76b58481a17ff19ca87
+2 of 4 encoding; share set ID e7bc; share length 102
+  Share  1: SSS-J3N84hNNoV5ZYcjnWXeRLZ4sJEmGQ7tdUfXxhasAEb2synv2Ygb1p9sW31svpMDrXM7hxYCDTSftZJdb2EtR1gQviu1NJQNV1N
+  Share  2: SSS-J3N85PjRCeo4smn5KW7YJNtrrDxGXmrh58NntoxcJtuuS5wA77JycgvLx2DFfkTAbdzMapkHwSE4daS7Drs4a3NLRuNwKopn1T
+  Share  3: SSS-J3N85nJxNNCfhVU87qWbh6F7tYDWHM1RpKMy6xYUFJXZA3WZkTjjbwtakws6mbQ5EYW3kddvYPcGeyGz9h3ei6J4jMZ542kwzA
+  Share  4: SSS-J3N86LXy38QWEoneDmowUeX4XRycx2uQqT8jT3H4cZLMQJAi1vejjMpJiGiFnY8ahKGQncL7KC8Ko8iWHuYfQmDmfg9QYtzhnf
 </pre>
