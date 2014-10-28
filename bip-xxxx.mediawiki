@@ -1,8 +1,7 @@
 <pre>
   BIP: xxxx
   Title: Shamir's Secret Sharing Scheme
-  Author: Matt Whitlock <bip@mattwhitlock.name>,
-          Nikita Schmidt,
+  Author: Nikita Schmidt,
           Jan Møller,
 	  Jérôme Rousselot
   Status: Draft
@@ -118,7 +117,7 @@ Each share in a set of compatible shares have a unique serial number ''x'' ≤ '
 
 A common practice is to use the application/version byte (AVB) to both identify the type of payload and force the initial character/s in the Base58Check encoding to a specific prefix, aiding visual recognition of different types of encoded data.  However, the latter is only possible with fixed length payloads.  To preserve both functions of the AVB, this specification proposes to effectively move it outside of the binary payload by attaching the 'SSS-' prefix to the Base58Check encoded string.
 
-An earlier draft of this specification proposed GF(''P'') as the field, where ''P'' was a large prime number close to 2<sup>8''L''</sup>, specified individually for each possible value of ''L''.  In order to support arbitrary length secrets, the field was changed to GF(2<sup>8</sup>).
+An earlier [https://github.com/whitslack/btctool/blob/bip/bip-xxxx.mediawiki proposal by Matt Whitlock] utilized GF(''P'') as the field, where ''P'' was a large prime number close to 2<sup>8''L''</sup>, specified individually for each possible value of ''L''.  In order to support arbitrary length secrets, this specification adopted GF(2<sup>8</sup>) instead.
 
 A timestamp field was discussed, which would be useful to determine the key inception time point to optimize private key import into a wallet.  However, it has no general use in the secret sharing scheme and belongs rather to the payload data.  An encoding that contains inception time, e.g. as [https://bitcointalk.org/index.php?topic=258678.0 proposed by J.-P. Kogelman and W. Yager], can be used as the content payload.
 
